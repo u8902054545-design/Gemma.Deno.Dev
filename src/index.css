@@ -6,8 +6,8 @@
 }
 
 body {
-  background-color: #1e1e2e;
-  color: #ffffff;
+  background-color: #000000;
+  color: #000000;
 }
 
 @keyframes animated-gradient-slow {
@@ -24,14 +24,14 @@ body {
 
 .animate-gradient {
   background-size: 200% 200%;
-  animation: animated-gradient-slow 4s ease infinite;
+  animation: animated-gradient-slow 8s ease infinite;
   background-image: linear-gradient(
     90deg,
-    #1e1e2e,
-    #4f46e5,
     #818cf8,
-    #4f46e5,
-    #1e1e2e
+    #0000FF,
+    #00FFFF,
+    #1e1e2e,
+    #818cf8
   );
 }
 
