@@ -152,8 +152,8 @@ export default function App() {
       </main>
 
       {/* Input Section */}
-      <footer className="p-6 max-w-4xl w-full mx-auto">
-        <div className="p-[2px] rounded-3xl animate-gradient">
+      <footer className="p-8 max-w-4xl w-full mx-auto">
+        <div className="p-[1px] rounded-3xl animate-gradient input-glow">
           <div className="bg-black rounded-3xl flex items-end p-2">
             <textarea
               value={input}

@@ -35,9 +35,17 @@ body {
   );
 }
 
+/* Новый класс для мягкого свечения */
+.input-glow {
+  box-shadow: 0 0 15px rgba(129, 140, 248, 0.4), 
+              0 0 30px rgba(0, 255, 255, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
 .text-gradient {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
+
