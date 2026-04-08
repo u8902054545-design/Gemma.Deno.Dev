@@ -7,19 +7,17 @@
 
 body {
   background-color: #000000;
-  color: #000000;
+  /* Исправлено: текст теперь будет виден */
+  color: #ffffff; 
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @keyframes animated-gradient-slow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .animate-gradient {
@@ -35,17 +33,23 @@ body {
   );
 }
 
-/* Новый класс для мягкого свечения */
 .input-glow {
-  box-shadow: 0 0 15px rgba(129, 140, 248, 0.4), 
+  box-shadow: 0 0 15px rgba(129, 140, 248, 0.4),
               0 0 30px rgba(0, 255, 255, 0.2);
   transition: box-shadow 0.3s ease;
 }
 
+/* Улучшенный градиент для текста */
 .text-gradient {
+  background-size: 200% 200%;
+  animation: animated-gradient-slow 8s ease infinite;
+  background-image: linear-gradient(
+    90deg,
+    #818cf8,
+    #00FFFF,
+    #0000FF
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: transparent;
 }
-

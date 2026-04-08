@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, ChevronDown, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
+// Импортируем наш конфиг
+import { SUPABASE_ENDPOINT } from './config';
 
 type Message = {
   id: string;
@@ -36,24 +38,52 @@ export default function App() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isTyping) return;
 
-    const newUserMsg: Message = { id: Date.now().toString(), role: 'user', content: input };
+    const userText = input.trim();
+    const newUserMsg: Message = { id: Date.now().toString(), role: 'user', content: userText };
+    
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
 
-    // Mock AI response
-    setTimeout(() => {
+    try {
+      // Отправляем запрос на твой Supabase Edge Function
+      const response = await fetch(SUPABASE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userText,
+          model: selectedModel,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка сети или сервера');
+      }
+
+      const data = await response.json();
+
       const newAiMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: `This is a mock response from ${selectedModel} to: "${newUserMsg.content}"`
+        content: data.content // Тот самый контент, который присылает функция
       };
+
       setMessages(prev => [...prev, newAiMsg]);
+    } catch (error) {
+      // Если что-то пошло не так, выводим ошибку в чат
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'ai',
+        content: 'Произошла ошибка при попытке связаться с Gemma. Попробуй позже!'
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -122,9 +152,14 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               className={`flex gap-4 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-[#0000FF]' : 'bg-[#1a1a1a] border border-[#333]'}`}>
-                {msg.role === 'user' ? <User size={20} /> : <GemmaIcon className="w-6 h-6" />}
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${msg.role === 'user' ? 'bg-[#0000FF]' : 'bg-[#1a1a1a] border border-[#333]'}`}>
+                {msg.role === 'user' ? (
+                  <User size={20} />
+                ) : (
+                  <GemmaIcon className="w-full h-full" />
+                )}
               </div>
+
               <div className={`px-6 py-4 rounded-3xl leading-relaxed ${msg.role === 'user' ? 'bg-[#0000FF] text-white rounded-tr-sm' : 'bg-[#1a1a1a] text-gray-100 border border-[#333] rounded-tl-sm'}`}>
                 {msg.content}
               </div>
@@ -137,8 +172,8 @@ export default function App() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="flex gap-4 max-w-[85%]"
             >
-               <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-[#1a1a1a] border border-[#333]">
-                <GemmaIcon className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden bg-[#1a1a1a] border border-[#333]">
+                <GemmaIcon className="w-full h-full" />
               </div>
               <div className="px-6 py-4 rounded-3xl bg-[#1a1a1a] border border-[#333] text-gray-100 rounded-tl-sm flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full animate-gradient"></div>
