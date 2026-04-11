@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { SUPABASE_ENDPOINT } from '../config';
 
-// Описываем тип прямо здесь для удобства
+// Message type definition
 export type Message = {
   id: string;
   role: 'user' | 'ai';
@@ -15,6 +15,8 @@ export const MODELS = [
   'Gemma 3 27B',
   'Gemma 3n E2B',
   'Gemma 3n E4B',
+  'Gemma 4 26B A4B IT',
+  'Gemma 4 31B IT',
 ];
 
 export const useChat = () => {

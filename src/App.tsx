@@ -33,13 +33,10 @@ export default function App() {
               key={msg.id}
               role={msg.role}
               content={msg.content}
-              // Спиннер включается, если это последнее сообщение от AI и идет загрузка
               isGenerating={isTyping && index === messages.length - 1 && msg.role === 'ai'}
             />
           ))}
 
-          {/* TypingIndicator можно оставить для визуального веса внизу, 
-              либо закомментировать, так как спиннер уже есть на аватарке */}
           {isTyping && <TypingIndicator />}
         </AnimatePresence>
 
@@ -59,7 +56,6 @@ export default function App() {
         models={models}
       />
 
-      {/* Нижний отступ, чтобы инпут не перекрывал последние сообщения */}
       <div className="h-[140px] w-full flex-shrink-0" />
     </div>
   );

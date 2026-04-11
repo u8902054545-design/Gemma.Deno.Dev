@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GemmaIcon } from '../GemmaIcon';
+import { GemmaIcon } from './GemmaIcon';
 
 type ModelSelectorProps = {
   selectedModel: string;

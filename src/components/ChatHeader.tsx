@@ -1,5 +1,5 @@
 import React from 'react';
-import { GemmaIcon } from '../GemmaIcon';
+import { GemmaIcon } from './GemmaIcon';
 
 export const ChatHeader: React.FC = () => {
   return (

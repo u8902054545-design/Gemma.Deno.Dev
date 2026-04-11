@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { GemmaIcon } from '../GemmaIcon';
+import { GemmaIcon } from './GemmaIcon';
 
 export const TypingIndicator: React.FC = () => {
   return (

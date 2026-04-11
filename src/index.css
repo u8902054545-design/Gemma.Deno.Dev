@@ -17,7 +17,6 @@ body {
   -ms-user-select: none;
 }
 
-/* Спиннер в стиле Google Gemini */
 .google-spinner {
   width: 40px;
   height: 40px;
