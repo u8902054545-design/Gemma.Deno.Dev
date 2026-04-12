@@ -1,5 +1,6 @@
 import React from 'react';
 import { GemmaIcon } from './GemmaIcon';
+import { UserProfile } from './UserProfile';
 
 export const ChatHeader: React.FC = () => {
   return (
@@ -10,6 +11,9 @@ export const ChatHeader: React.FC = () => {
           Gemma Open Access
         </h1>
       </div>
+      
+      {/* Добавляем наш новый компонент сюда */}
+      <UserProfile />
     </header>
   );
 };
