@@ -10,17 +10,14 @@ export const TypingIndicator: React.FC = () => {
       exit={{ opacity: 0 }}
       className="flex flex-col items-start mb-8"
     >
-      {/* Контейнер аватарки со спиннером */}
-      <div className="relative flex items-center justify-center w-10 h-10">
-        {/* Тот самый спиннер из index.css */}
+      <div className="relative flex items-center justify-center w-12 h-12">
         <div className="google-spinner" />
-        
+
         <div className="z-10 flex items-center justify-center">
-          <GemmaIcon className="w-7 h-7" />
+          <GemmaIcon className="w-9 h-9" />
         </div>
       </div>
 
-      {/* Небольшой отступ снизу, чтобы сохранить геометрию чата */}
       <div className="h-6 w-full" />
     </motion.div>
   );

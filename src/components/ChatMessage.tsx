@@ -24,15 +24,15 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
       className={`flex flex-col gap-2 mb-8 ${isAI ? 'items-start' : 'items-end'}`}
     >
       <div className={`flex items-center gap-3 ${isAI ? 'flex-row' : 'flex-row-reverse'}`}>
-        <div className="relative flex items-center justify-center w-10 h-10">
+        <div className="relative flex items-center justify-center w-12 h-12">
           {isAI && isGenerating && (
             <div className="google-spinner" />
           )}
-          <div className={`z-10 flex items-center justify-center ${!isAI ? 'bg-blue-600 w-8 h-8 rounded-full' : ''}`}>
+          <div className={`z-10 flex items-center justify-center ${!isAI ? 'bg-[#4285F4] w-9 h-9 rounded-full' : ''}`}>
             {isAI ? (
-              <GemmaIcon className="w-7 h-7" />
+              <GemmaIcon className="w-9 h-9" />
             ) : (
-              <User size={18} className="text-white" />
+              <User size={20} className="text-white" />
             )}
           </div>
         </div>
@@ -68,7 +68,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
           className={`max-w-[90%] text-[16px] leading-relaxed ${
             isAI
               ? 'text-gray-100 px-1'
-              : 'bg-blue-600 text-white px-4 py-2 rounded-2xl self-end'
+              : 'bg-[#4285F4] text-white px-4 py-2 rounded-2xl self-end'
           }`}
         >
           {mainContent}

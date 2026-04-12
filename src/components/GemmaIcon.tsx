@@ -2,7 +2,7 @@ import React from 'react';
 
 export const GemmaIcon = ({ className = "" }: { className?: string }) => (
   <span className={className} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" style={{ flex: 'none', lineHeight: 1 }}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" style={{ flex: 'none', display: 'block' }}>
       <title>Gemma</title>
       <defs>
         <linearGradient id="a" x1="24.419%" x2="75.194%" y1="75.581%" y2="25.194%">

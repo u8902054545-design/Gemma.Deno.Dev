@@ -1,6 +1,5 @@
 import React from 'react';
 import { Send } from 'lucide-react';
-// Импортируем наш селектор
 import { ModelSelector } from './ModelSelector';
 
 type ChatInputProps = {
@@ -48,13 +47,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             >
               <Send
                 size={20}
-                className={input.trim() && !isTyping ? "text-[#00FFFF]" : "text-gray-600"}
+                className={input.trim() && !isTyping ? "text-[#4285F4]" : "text-gray-600"}
               />
             </button>
           </div>
 
-          {/* Вместо огромного куска кода просто вызываем ModelSelector */}
-          <ModelSelector 
+          <ModelSelector
             selectedModel={selectedModel}
             setSelectedModel={setSelectedModel}
             isDropdownOpen={isDropdownOpen}
