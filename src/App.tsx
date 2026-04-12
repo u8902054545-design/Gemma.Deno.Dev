@@ -5,6 +5,7 @@ import { ChatHeader } from './components/ChatHeader';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
 import { TypingIndicator } from './components/TypingIndicator';
+import Snackbar from './components/Snackbar';
 
 export default function App() {
   const {
@@ -19,7 +20,11 @@ export default function App() {
     messagesEndRef,
     handleSend,
     handleKeyDown,
-    models
+    models,
+    // Новые поля из хука
+    snackbarMessage,
+    isSnackbarOpen,
+    setIsSnackbarOpen
   } = useChat();
 
   return (
@@ -54,6 +59,13 @@ export default function App() {
         setIsDropdownOpen={setIsDropdownOpen}
         isTyping={isTyping}
         models={models}
+      />
+
+      {/* Snackbar уведомление */}
+      <Snackbar 
+        message={snackbarMessage} 
+        isOpen={isSnackbarOpen} 
+        onClose={() => setIsSnackbarOpen(false)} 
       />
 
       <div className="h-[140px] w-full flex-shrink-0" />
