@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 @import "tailwindcss";
 
 @theme {
@@ -30,9 +31,25 @@ body {
   -webkit-user-select: none;
 }
 
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 .google-mesh-gradient {
   background-color: var(--md-sys-color-background);
-  background-image: 
+  background-image:
     radial-gradient(at 0% 0%, rgba(66, 133, 244, 0.1) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(234, 67, 53, 0.1) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(251, 188, 5, 0.07) 0px, transparent 50%),

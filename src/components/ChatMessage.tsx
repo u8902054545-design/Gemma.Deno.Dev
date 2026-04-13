@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { User, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
 
@@ -27,7 +26,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
         <div className="relative flex items-center justify-center w-12 h-12">
           {isAI && isGenerating && <div className="google-spinner" />}
           <div className={`z-10 flex items-center justify-center ${!isAI ? 'bg-[var(--google-blue)] w-9 h-9 rounded-full' : ''}`}>
-            {isAI ? <GemmaIcon className="w-9 h-9" /> : <User size={20} className="text-white" />}
+            {isAI ? (
+              <GemmaIcon className="w-9 h-9" />
+            ) : (
+              <span className="material-symbols-outlined text-white text-[20px]">person</span>
+            )}
           </div>
         </div>
 
@@ -37,7 +40,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--md-sys-color-surface-container-high)] hover:bg-[#333] border border-[var(--md-sys-color-outline)]/30 transition-colors text-xs text-[var(--md-sys-color-on-surface-variant)]"
           >
             <span>Показать мысль</span>
-            {isThoughtExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            <span className="material-symbols-outlined text-[14px]">
+              {isThoughtExpanded ? 'expand_less' : 'expand_more'}
+            </span>
           </button>
         )}
       </div>

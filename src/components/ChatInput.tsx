@@ -1,5 +1,4 @@
 import React from 'react';
-import { Send } from 'lucide-react';
 import { ModelSelector } from './ModelSelector';
 
 type ChatInputProps = {
@@ -35,12 +34,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             <button
               onClick={handleSend}
               disabled={!input.trim() || isTyping}
-              className="p-3 bg-[var(--md-sys-color-surface-container-high)] hover:bg-[#333] border border-[var(--md-sys-color-outline)]/30 disabled:opacity-30 rounded-full transition-all mb-1 active:scale-90"
+              className="p-3 disabled:opacity-30 transition-all mb-1 active:scale-90 flex items-center justify-center"
             >
-              <Send
-                size={20}
-                className={input.trim() && !isTyping ? "text-[var(--google-blue)]" : "text-[var(--md-sys-color-on-surface-variant)]"}
-              />
+              <span className={`material-symbols-outlined text-[20px] ${input.trim() && !isTyping ? "text-[var(--google-blue)]" : "text-[var(--md-sys-color-on-surface-variant)]"}`}>
+                send
+              </span>
             </button>
           </div>
           <ModelSelector

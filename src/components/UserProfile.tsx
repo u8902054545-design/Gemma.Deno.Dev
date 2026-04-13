@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../hooks/useAuth';
-import { LogOut, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
@@ -18,7 +17,7 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     const rect = button.getBoundingClientRect();
     const size = Math.max(button.clientWidth, button.clientHeight);
     const circle = document.createElement("span");
-    
+
     circle.style.width = circle.style.height = `${size}px`;
     circle.style.left = `${event.clientX - rect.left}px`;
     circle.style.top = `${event.clientY - rect.top}px`;
@@ -34,7 +33,7 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
     setTimeout(() => {
       signOut();
       onClose();
-    }, 450); 
+    }, 450);
   };
 
   const drawerView = (
@@ -49,16 +48,16 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           className="fixed inset-0 bg-black google-mesh-gradient flex flex-col font-sans overflow-hidden"
         >
           <header className="w-full p-4 flex items-center justify-between border-b border-white/10 bg-black">
-            <button 
+            <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 active:scale-90"
+              className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 active:scale-90 flex items-center justify-center"
             >
-              <X size={24} />
+              <span className="material-symbols-outlined text-[24px]">close</span>
             </button>
             <span className="text-gray-400 text-sm font-medium truncate max-w-[200px]">
               {userEmail}
             </span>
-            <div className="w-10" /> 
+            <div className="w-10" />
           </header>
 
           <main className="flex-1 flex flex-col items-center justify-start pt-16 px-6 overflow-y-auto">
@@ -87,7 +86,7 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
                 onClick={handleRipple}
                 className="ripple-container w-full flex items-center justify-center gap-3 px-8 py-4 bg-transparent hover:bg-white/5 text-white border border-[var(--md-sys-color-outline)] rounded-2xl font-medium transition-all outline-none"
               >
-                <LogOut size={18} className="text-gray-400" />
+                <span className="material-symbols-outlined text-[18px] text-gray-400">logout</span>
                 <span>Sign out</span>
               </button>
             </div>
@@ -116,14 +115,14 @@ export const UserProfile: React.FC = () => {
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="w-10 h-10 rounded-full overflow-hidden border border-[#1a1a1a] hover:border-[#333] transition-all active:scale-95 shadow-lg relative flex items-center justify-center bg-black"
       >
         {userAvatar ? (
           <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
         ) : (
-          <User size={20} className="text-gray-400" />
+          <span className="material-symbols-outlined text-[20px] text-gray-400">person</span>
         )}
       </button>
 
