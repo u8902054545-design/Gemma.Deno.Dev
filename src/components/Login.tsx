@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GemmaIcon } from './GemmaIcon';
 import { GoogleIcon } from './GoogleIcon';
+import Snackbar from './Snackbar'; // Импортируем без фигурных скобок
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -8,13 +9,17 @@ interface LoginProps {
 
 export default function Login({ onLoginSuccess }: LoginProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showSnack, setShowSnack] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
 
   const handleLogin = async () => {
     setIsLoading(true);
     try {
       await onLoginSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      setSnackMessage(error.message || "Ошибка входа");
+      setShowSnack(true);
       setIsLoading(false);
     }
   };
@@ -54,6 +59,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           Material 3 Design System
         </p>
       </div>
+
+      <Snackbar 
+        message={snackMessage} 
+        isOpen={showSnack} 
+        onClose={() => setShowSnack(false)} 
+      />
     </div>
   );
 }
