@@ -6,33 +6,90 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
   useEffect(() => {
-    // 1. Проверяем текущую сессию при загрузке
+    let profileSubscription: any = null;
+
+    const setupRealtimeSubscription = (userId: string) => {
+      if (profileSubscription) supabase.removeChannel(profileSubscription);
+
+      profileSubscription = supabase
+        .channel(`public:profiles:id=eq.${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${userId}`,
+          },
+          (payload) => {
+            if (payload.new && payload.new.is_blocked === true) {
+              signOut();
+            }
+          }
+        )
+        .subscribe();
+    };
+
+    const handleAuth = async (session: any) => {
+      const currentUser = session?.user ?? null;
+
+      if (currentUser) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('is_blocked')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+
+          if (error) throw error;
+
+          if (data?.is_blocked) {
+            await signOut();
+          } else {
+            setUser(currentUser);
+            setupRealtimeSubscription(currentUser.id);
+          }
+        } catch (err) {
+          console.error("Ошибка проверки профиля:", err);
+          setUser(currentUser); // Пускаем, если база недоступна, сервер всё равно заблокирует запрос
+        }
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    };
+
+    // Проверка при старте
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+      handleAuth(session);
     });
 
-    // 2. Слушаем изменения (вход/выход)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+    // Слушатель событий
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((_event, session) => {
+      handleAuth(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      authSub.unsubscribe();
+      if (profileSubscription) supabase.removeChannel(profileSubscription);
+    };
   }, []);
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin, // Возвращает пользователя на сайт после входа
-      },
-    });
-  };
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+    } catch (error) {
+      console.error("Ошибка входа:", error);
+    }
   };
 
   return { user, loading, signInWithGoogle, signOut };
