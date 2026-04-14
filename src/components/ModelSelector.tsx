@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
+import { mdEasing, mdDuration } from '../motion/transitions';
 
 type ModelSelectorProps = {
   selectedModel: string;
@@ -32,9 +33,10 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       <AnimatePresence>
         {isDropdownOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: mdDuration.medium1, ease: mdEasing.emphasized }}
             className="absolute bottom-full left-0 mb-4 w-56 bg-[#1a1a1a] border border-[#333] rounded-xl shadow-2xl z-50 overflow-hidden"
           >
             {models.map((model) => (

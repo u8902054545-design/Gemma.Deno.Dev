@@ -1,17 +1,18 @@
 import React from 'react';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
-import { useAuth } from './hooks/useAuth'; // Импортируем твой хук
+import { useAuth } from './hooks/useAuth';
 import { ChatHeader } from './components/ChatHeader';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
 import { TypingIndicator } from './components/TypingIndicator';
 import Snackbar from './components/Snackbar';
 import Login from './components/Login';
+import { pageVariants } from './motion/transitions';
 
 export default function App() {
-  const { user, loading, signInWithGoogle } = useAuth(); // Берем данные об игроке
-  
+  const { user, loading, signInWithGoogle } = useAuth();
+
   const {
     messages,
     input,
@@ -30,58 +31,71 @@ export default function App() {
     setIsSnackbarOpen
   } = useChat();
 
-  // 1. Пока Supabase проверяет сессию, можно показать пустой черный экран или спиннер
   if (loading) {
     return <div className="min-h-screen bg-black" />;
   }
 
-  // 2. Если пользователя нет — показываем экран Login
-  if (!user) {
-    return <Login onLoginSuccess={signInWithGoogle} />;
-  }
-
-  // 3. Если пользователь вошел — показываем чат
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex flex-col">
-      <ChatHeader />
+    <AnimatePresence mode="wait">
+      {!user ? (
+        <motion.div
+          key="login-screen"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="min-h-screen bg-black"
+        >
+          <Login onLoginSuccess={signInWithGoogle} />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="chat-screen"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="min-h-screen bg-black text-white font-sans flex flex-col"
+        >
+          <ChatHeader />
 
-      <main className="flex-1 overflow-y-auto p-6 max-w-4xl w-full mx-auto flex flex-col">
-        <AnimatePresence initial={false}>
-          {messages.map((msg, index) => (
-            <ChatMessage
-              key={msg.id}
-              role={msg.role}
-              content={msg.content}
-              isGenerating={isTyping && index === messages.length - 1 && msg.role === 'ai'}
-            />
-          ))}
+          <main className="flex-1 overflow-y-auto p-6 max-w-4xl w-full mx-auto flex flex-col">
+            <AnimatePresence initial={false}>
+              {messages.map((msg, index) => (
+                <ChatMessage
+                  key={msg.id}
+                  role={msg.role}
+                  content={msg.content}
+                  isGenerating={isTyping && index === messages.length - 1 && msg.role === 'ai'}
+                />
+              ))}
+              {isTyping && <TypingIndicator />}
+            </AnimatePresence>
+            <div ref={messagesEndRef} />
+          </main>
 
-          {isTyping && <TypingIndicator />}
-        </AnimatePresence>
+          <ChatInput
+            input={input}
+            setInput={setInput}
+            handleSend={handleSend}
+            handleKeyDown={handleKeyDown}
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            isDropdownOpen={isDropdownOpen}
+            setIsDropdownOpen={setIsDropdownOpen}
+            isTyping={isTyping}
+            models={models}
+          />
 
-        <div ref={messagesEndRef} />
-      </main>
+          <Snackbar
+            message={snackbarMessage}
+            isOpen={isSnackbarOpen}
+            onClose={() => setIsSnackbarOpen(false)}
+          />
 
-      <ChatInput
-        input={input}
-        setInput={setInput}
-        handleSend={handleSend}
-        handleKeyDown={handleKeyDown}
-        selectedModel={selectedModel}
-        setSelectedModel={setSelectedModel}
-        isDropdownOpen={isDropdownOpen}
-        setIsDropdownOpen={setIsDropdownOpen}
-        isTyping={isTyping}
-        models={models}
-      />
-
-      <Snackbar
-        message={snackbarMessage}
-        isOpen={isSnackbarOpen}
-        onClose={() => setIsSnackbarOpen(false)}
-      />
-
-      <div className="h-[140px] w-full flex-shrink-0" />
-    </div>
+          <div className="h-[140px] w-full flex-shrink-0" />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

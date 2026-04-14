@@ -8,7 +8,9 @@ export const useAuth = () => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setUser(null);
+    setTimeout(() => {
+      setUser(null);
+    }, 100);
   };
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export const useAuth = () => {
           }
         } catch (err) {
           console.error("Ошибка проверки профиля:", err);
-          setUser(currentUser); // Пускаем, если база недоступна, сервер всё равно заблокирует запрос
+          setUser(currentUser);
         }
       } else {
         setUser(null);
@@ -65,12 +67,10 @@ export const useAuth = () => {
       setLoading(false);
     };
 
-    // Проверка при старте
     supabase.auth.getSession().then(({ data: { session } }) => {
       handleAuth(session);
     });
 
-    // Слушатель событий
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((_event, session) => {
       handleAuth(session);
     });

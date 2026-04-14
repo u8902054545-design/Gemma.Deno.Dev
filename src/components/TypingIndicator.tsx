@@ -1,13 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
+import { mdEasing, mdDuration } from '../motion/transitions';
 
 export const TypingIndicator: React.FC = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: mdDuration.short4, ease: mdEasing.decelerate }}
       className="flex flex-col items-start mb-8"
     >
       <div className="relative flex items-center justify-center w-12 h-12">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../hooks/useAuth';
 import { motion, AnimatePresence } from 'motion/react';
+import { pageVariants } from '../motion/transitions';
 
 const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { user, signOut } = useAuth();
@@ -37,13 +38,13 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   };
 
   const drawerView = (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 30, stiffness: 250 }}
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
           style={{ zIndex: 99999 }}
           className="fixed inset-0 bg-black google-mesh-gradient flex flex-col font-sans overflow-hidden"
         >

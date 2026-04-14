@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
+import { mdEasing, mdDuration } from '../motion/transitions';
 
 type ChatMessageProps = {
   role: 'user' | 'ai';
@@ -18,8 +19,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: mdDuration.short4, ease: mdEasing.decelerate }}
       className={`flex flex-col gap-2 mb-8 ${isAI ? 'items-start' : 'items-end'}`}
     >
       <div className={`flex items-center gap-3 ${isAI ? 'flex-row' : 'flex-row-reverse'}`}>
@@ -54,6 +56,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: mdDuration.medium1, ease: mdEasing.standard }}
               className="overflow-hidden"
             >
               <div className="text-sm text-[var(--md-sys-color-on-surface-variant)] italic border-l-2 border-[var(--md-sys-color-outline)] pl-4 py-1 my-2">
