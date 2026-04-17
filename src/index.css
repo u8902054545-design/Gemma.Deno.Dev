@@ -26,7 +26,11 @@
   --md-sys-motion-duration-short4: 200ms;
 }
 
-body {
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
   background-color: var(--md-sys-color-background);
   color: var(--md-sys-color-on-background);
   margin: 0;
@@ -34,6 +38,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
   user-select: none;
   -webkit-user-select: none;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .material-symbols-outlined {
@@ -59,6 +71,7 @@ body {
     radial-gradient(at 100% 0%, rgba(234, 67, 53, 0.1) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(251, 188, 5, 0.07) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(52, 168, 83, 0.07) 0px, transparent 50%);
+  transform: translateZ(0);
 }
 
 .google-spinner {
@@ -70,6 +83,7 @@ body {
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 100%);
   mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 100%);
   animation: spin 1.5s linear infinite;
+  will-change: transform;
 }
 
 @keyframes spin {
@@ -81,6 +95,9 @@ body {
   background-size: 200% 200%;
   animation: animated-gradient-slow 8s ease infinite;
   background-image: linear-gradient(90deg, var(--google-blue), var(--google-red), var(--google-yellow), var(--google-green), var(--google-blue));
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: background-position;
 }
 
 @keyframes animated-gradient-slow {
@@ -96,12 +113,14 @@ body {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  will-change: background-position;
 }
 
 .ripple-container {
   position: relative;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
 }
 
 .md3-ripple {
@@ -119,4 +138,8 @@ body {
 
 .animate-ripple {
   animation: md3-ripple-grow var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized) forwards;
+}
+
+div[class*='motion'] {
+  will-change: transform, opacity;
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { SUPABASE_ENDPOINT, supabase } from '../config';
 
 export type Message = {
@@ -26,21 +26,28 @@ export const useChat = () => {
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  
+
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Оптимизированный скролл: используем 'instant' для мгновенного отклика
+  const scrollToBottom = useCallback((smooth = false) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: smooth ? 'smooth' : 'auto' 
+      });
+    }
+  }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+    // При получении нового сообщения от ИИ используем плавный скролл
+    // При вводе пользователем — мгновенный для скорости
+    scrollToBottom(isTyping);
+  }, [messages, isTyping, scrollToBottom]);
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!input.trim() || isTyping) return;
 
     const { data: { session } } = await supabase.auth.getSession();
@@ -85,8 +92,8 @@ export const useChat = () => {
 
       setMessages(prev => [...prev, newAiMsg]);
     } catch (error: any) {
-      const errorMessage = error.message.includes('Failed to fetch') 
-        ? 'Network error: Check your connection' 
+      const errorMessage = error.message.includes('Failed to fetch')
+        ? 'Network error: Check your connection'
         : error.message;
 
       setSnackbarMessage(errorMessage);
@@ -94,7 +101,7 @@ export const useChat = () => {
     } finally {
       setIsTyping(false);
     }
-  };
+  }, [input, isTyping, selectedModel]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

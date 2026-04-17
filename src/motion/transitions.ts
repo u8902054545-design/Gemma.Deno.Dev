@@ -17,22 +17,19 @@ export const mdDuration = {
 export const pageVariants: Variants = {
   initial: {
     opacity: 0,
-    scale: 0.98,
-    filter: 'blur(4px)',
+    x: 20,
   },
   animate: {
     opacity: 1,
-    scale: 1,
-    filter: 'blur(0px)',
+    x: 0,
     transition: {
       duration: mdDuration.medium4,
-      ease: mdEasing.emphasized,
+      ease: mdEasing.standard,
     },
   },
   exit: {
     opacity: 0,
-    scale: 1.02,
-    filter: 'blur(4px)',
+    x: -20,
     transition: {
       duration: mdDuration.short4,
       ease: mdEasing.accelerate,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
 import { mdEasing, mdDuration } from '../motion/transitions';
@@ -9,13 +9,16 @@ type ChatMessageProps = {
   isGenerating?: boolean;
 };
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGenerating }) => {
+const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGenerating }) => {
   const isAI = role === 'ai';
   const [isThoughtExpanded, setIsThoughtExpanded] = useState(false);
 
-  const thoughtMatch = content.match(/\*([\s\S]*?)\*/);
-  const thought = thoughtMatch ? thoughtMatch[1].trim() : null;
-  const mainContent = thoughtMatch ? content.replace(thoughtMatch[0], '').trim() : content;
+  const { thought, mainContent } = useMemo(() => {
+    const thoughtMatch = content.match(/\*([\s\S]*?)\*/);
+    const thoughtText = thoughtMatch ? thoughtMatch[1].trim() : null;
+    const contentText = thoughtMatch ? content.replace(thoughtMatch[0], '').trim() : content;
+    return { thought: thoughtText, mainContent: contentText };
+  }, [content]);
 
   return (
     <motion.div
@@ -53,11 +56,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
         <AnimatePresence>
           {isAI && thought && isThoughtExpanded && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
               transition={{ duration: mdDuration.medium1, ease: mdEasing.standard }}
-              className="overflow-hidden"
             >
               <div className="text-sm text-[var(--md-sys-color-on-surface-variant)] italic border-l-2 border-[var(--md-sys-color-outline)] pl-4 py-1 my-2">
                 {thought}
@@ -79,3 +81,5 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, isGener
     </motion.div>
   );
 };
+
+export const ChatMessage = memo(ChatMessageComponent);

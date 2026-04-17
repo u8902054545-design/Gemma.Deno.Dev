@@ -32,7 +32,7 @@ export default function App() {
   } = useChat();
 
   if (loading) {
-    return <div className="min-h-screen bg-black" />;
+    return <div className="h-screen w-full bg-black" />;
   }
 
   return (
@@ -44,7 +44,7 @@ export default function App() {
           initial="initial"
           animate="animate"
           exit="exit"
-          className="min-h-screen bg-black"
+          className="h-screen w-full bg-black overflow-hidden"
         >
           <Login onLoginSuccess={signInWithGoogle} />
         </motion.div>
@@ -55,11 +55,11 @@ export default function App() {
           initial="initial"
           animate="animate"
           exit="exit"
-          className="min-h-screen bg-black text-white font-sans flex flex-col"
+          className="h-screen w-full bg-black text-white font-sans flex flex-col overflow-hidden"
         >
           <ChatHeader />
 
-          <main className="flex-1 overflow-y-auto p-6 max-w-4xl w-full mx-auto flex flex-col">
+          <main className="flex-1 overflow-y-auto p-6 max-w-4xl w-full mx-auto flex flex-col scroll-smooth">
             <AnimatePresence initial={false}>
               {messages.map((msg, index) => (
                 <ChatMessage
@@ -92,8 +92,6 @@ export default function App() {
             isOpen={isSnackbarOpen}
             onClose={() => setIsSnackbarOpen(false)}
           />
-
-          <div className="h-[140px] w-full flex-shrink-0" />
         </motion.div>
       )}
     </AnimatePresence>
