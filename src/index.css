@@ -143,3 +143,87 @@ html, body {
 div[class*='motion'] {
   will-change: transform, opacity;
 }
+
+.markdown-content strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.markdown-content p {
+  margin-bottom: 1.2rem;
+  line-height: 1.6;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.code-container {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e1e1e;
+  padding: 8px 16px;
+  border-radius: 14px 14px 0 0;
+  border: 1px solid var(--md-sys-color-outline);
+  border-bottom: none;
+}
+
+.code-lang {
+  font-family: monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+  letter-spacing: 0.5px;
+}
+
+.copy-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+}
+
+.copy-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.copy-button span {
+  font-size: 12px;
+}
+
+.code-gradient-border {
+  padding: 1.5px;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(90deg, var(--google-blue), var(--google-red), var(--google-yellow), var(--google-green), var(--google-blue));
+  background-size: 200% 200%;
+  animation: animated-gradient-slow 8s ease infinite;
+  overflow: hidden;
+}
+
+.code-gradient-border > div {
+  border-radius: 0 0 12px 12px !important;
+  overflow-x: auto !important;
+}
+
+.code-gradient-border > div::-webkit-scrollbar {
+  height: 5px;
+}
+
+.code-gradient-border > div::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
