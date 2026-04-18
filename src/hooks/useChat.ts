@@ -19,9 +19,7 @@ export const MODELS = [
 ];
 
 export const useChat = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', role: 'ai', content: 'Hello! I am Gemma. How can I help you today?' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -32,23 +30,22 @@ export const useChat = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Оптимизированный скролл: используем 'instant' для мгновенного отклика
   const scrollToBottom = useCallback((smooth = false) => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ 
-        behavior: smooth ? 'smooth' : 'auto' 
+      messagesEndRef.current.scrollIntoView({
+        behavior: smooth ? 'smooth' : 'auto'
       });
     }
   }, []);
 
   useEffect(() => {
-    // При получении нового сообщения от ИИ используем плавный скролл
-    // При вводе пользователем — мгновенный для скорости
     scrollToBottom(isTyping);
   }, [messages, isTyping, scrollToBottom]);
 
-  const handleSend = useCallback(async () => {
-    if (!input.trim() || isTyping) return;
+  const handleSend = useCallback(async (overrideInput?: string) => {
+    const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
+    
+    if (!textToSend.trim() || isTyping) return;
 
     const { data: { session } } = await supabase.auth.getSession();
 
@@ -58,7 +55,7 @@ export const useChat = () => {
       return;
     }
 
-    const userText = input.trim();
+    const userText = textToSend.trim();
     const newUserMsg: Message = { id: Date.now().toString(), role: 'user', content: userText };
 
     setMessages(prev => [...prev, newUserMsg]);
