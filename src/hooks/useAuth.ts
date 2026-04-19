@@ -7,10 +7,8 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   const signOut = async () => {
+    setUser(null);
     await supabase.auth.signOut();
-    setTimeout(() => {
-      setUser(null);
-    }, 100);
   };
 
   useEffect(() => {
@@ -41,30 +39,33 @@ export const useAuth = () => {
     const handleAuth = async (session: any) => {
       const currentUser = session?.user ?? null;
 
-      if (currentUser) {
-        try {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('is_blocked')
-            .eq('id', currentUser.id)
-            .maybeSingle();
-
-          if (error) throw error;
-
-          if (data?.is_blocked) {
-            await signOut();
-          } else {
-            setUser(currentUser);
-            setupRealtimeSubscription(currentUser.id);
-          }
-        } catch (err) {
-          console.error("Ошибка проверки профиля:", err);
-          setUser(currentUser);
-        }
-      } else {
+      if (!currentUser) {
         setUser(null);
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_blocked')
+          .eq('id', currentUser.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data?.is_blocked) {
+          await signOut();
+        } else {
+          setUser(currentUser);
+          setupRealtimeSubscription(currentUser.id);
+        }
+      } catch (err) {
+        console.error(err);
+        setUser(currentUser);
+      } finally {
+        setLoading(false);
+      }
     };
 
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -88,7 +89,7 @@ export const useAuth = () => {
         options: { redirectTo: window.location.origin },
       });
     } catch (error) {
-      console.error("Ошибка входа:", error);
+      console.error(error);
     }
   };
 

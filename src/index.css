@@ -227,3 +227,9 @@ div[class*='motion'] {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
+
+md-circular-progress {
+  --md-circular-progress-size: 24px;
+  --md-circular-progress-active-indicator-color: var(--google-blue);
+  --md-circular-progress-active-indicator-width: 12;
+}

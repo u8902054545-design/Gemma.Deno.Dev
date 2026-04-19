@@ -4,8 +4,11 @@ import { useAuth } from '../hooks/useAuth';
 import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
 
+import '@material/web/progress/circular-progress.js';
+
 const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { user, signOut } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (!user) return null;
 
@@ -13,34 +16,22 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const userName = user.user_metadata?.full_name || user.email?.split('@')[0];
   const userEmail = user.email;
 
-  const handleRipple = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const button = event.currentTarget;
-    const rect = button.getBoundingClientRect();
-    const size = Math.max(button.clientWidth, button.clientHeight);
-    const circle = document.createElement("span");
-
-    circle.style.width = circle.style.height = `${size}px`;
-    circle.style.left = `${event.clientX - rect.left}px`;
-    circle.style.top = `${event.clientY - rect.top}px`;
-    circle.style.position = 'absolute';
-    circle.style.zIndex = '10';
-    circle.style.backgroundColor = 'rgba(255, 255, 255, 0.25)';
-    circle.classList.add("md3-ripple", "animate-ripple");
-
-    const oldRipple = button.getElementsByClassName("md3-ripple")[0];
-    if (oldRipple) oldRipple.remove();
-    button.appendChild(circle);
-
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    
     setTimeout(() => {
-      signOut();
       onClose();
-    }, 450);
+      setTimeout(async () => {
+        await signOut();
+      }, 500);
+    }, 800);
   };
 
   const drawerView = (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {isOpen && (
         <motion.div
+          key="profile-drawer"
           variants={pageVariants}
           initial="initial"
           animate="animate"
@@ -51,7 +42,8 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           <header className="w-full p-4 flex items-center justify-between border-b border-white/10 bg-black">
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 active:scale-90 flex items-center justify-center"
+              disabled={isLoggingOut}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 active:scale-90 flex items-center justify-center disabled:opacity-30"
             >
               <span className="material-symbols-outlined text-[24px]">close</span>
             </button>
@@ -84,11 +76,18 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
             <div className="w-full max-w-[320px]">
               <button
-                onClick={handleRipple}
-                className="ripple-container w-full flex items-center justify-center gap-3 px-8 py-4 bg-transparent hover:bg-white/5 text-white border border-[var(--md-sys-color-outline)] rounded-2xl font-medium transition-all outline-none"
+                onClick={handleSignOut}
+                disabled={isLoggingOut}
+                className="ripple-container w-full h-14 flex items-center justify-center gap-3 px-8 bg-transparent hover:bg-white/5 text-white border border-[var(--md-sys-color-outline)] rounded-2xl font-medium transition-all outline-none disabled:opacity-80"
               >
-                <span className="material-symbols-outlined text-[18px] text-gray-400">logout</span>
-                <span>Sign out</span>
+                {isLoggingOut ? (
+                  <md-circular-progress indeterminate aria-label="Logging out" />
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[18px] text-gray-400">logout</span>
+                    <span>Sign out</span>
+                  </>
+                )}
               </button>
             </div>
           </main>

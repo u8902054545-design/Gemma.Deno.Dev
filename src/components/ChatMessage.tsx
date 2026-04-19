@@ -21,9 +21,9 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
   const { thought, mainContent } = useMemo(() => {
     const thoughtMatch = content.match(/^\*([\s\S]*?)\*/);
     if (thoughtMatch) {
-      return { 
-        thought: thoughtMatch[1].trim(), 
-        mainContent: content.replace(thoughtMatch[0], '').trim() 
+      return {
+        thought: thoughtMatch[1].trim(),
+        mainContent: content.replace(thoughtMatch[0], '').trim()
       };
     }
     return { thought: null, mainContent: content.trim() };
@@ -44,10 +44,22 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
     >
       <div className={`flex items-center gap-3 ${isAI ? 'flex-row' : 'flex-row-reverse'}`}>
         <div className="relative flex items-center justify-center w-12 h-12">
-          {isAI && isGenerating && <div className="google-spinner" />}
-          <div className={`z-10 flex items-center justify-center ${!isAI ? 'bg-[var(--google-blue)] w-9 h-9 rounded-full' : ''}`}>
+          <AnimatePresence>
+            {isAI && isGenerating && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center z-0"
+              >
+                <div className="gradient-loader" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          <div className={`z-10 flex items-center justify-center rounded-full bg-black ${!isAI ? 'bg-[var(--google-blue)] w-9 h-9' : 'w-10 h-10'}`}>
             {isAI ? (
-              <GemmaIcon className="w-9 h-9" />
+              <GemmaIcon className="w-8 h-8" />
             ) : (
               <span className="material-symbols-outlined text-white text-[20px]">person</span>
             )}
@@ -74,7 +86,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: mdDuration.medium1, ease: mdEasing.standard }}
+              transition={{ duration: mdDuration.medium4, ease: mdEasing.standard }}
             >
               <div className="text-sm text-[var(--md-sys-color-on-surface-variant)] italic border-l-2 border-[var(--md-sys-color-outline)] pl-4 py-1 my-2">
                 {thought}
@@ -83,8 +95,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
           )}
         </AnimatePresence>
 
-        <div
-          className={`max-w-[100%] text-[16px] leading-relaxed markdown-content ${
+        <div className={`max-w-[100%] text-[16px] leading-relaxed markdown-content ${
             isAI
               ? 'text-[var(--md-sys-color-on-background)] px-1'
               : 'bg-[var(--google-blue)] text-white px-4 py-2 rounded-2xl self-end shadow-lg shadow-blue-900/10'
@@ -100,7 +111,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
                   <div className="code-container my-6">
                     <div className="code-header">
                       <span className="code-lang">{match[1]}</span>
-                      <button 
+                      <button
                         onClick={() => handleCopy(codeString)}
                         className="copy-button"
                       >
