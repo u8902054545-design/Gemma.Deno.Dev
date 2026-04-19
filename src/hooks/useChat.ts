@@ -24,6 +24,7 @@ export const useChat = () => {
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [chatId] = useState(() => crypto.randomUUID());
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
@@ -44,7 +45,7 @@ export const useChat = () => {
 
   const handleSend = useCallback(async (overrideInput?: string) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
-    
+
     if (!textToSend.trim() || isTyping) return;
 
     const { data: { session } } = await supabase.auth.getSession();
@@ -72,6 +73,7 @@ export const useChat = () => {
         body: JSON.stringify({
           message: userText,
           model: selectedModel,
+          chat_id: chatId
         }),
       });
 
@@ -98,7 +100,7 @@ export const useChat = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, selectedModel]);
+  }, [input, isTyping, selectedModel, chatId]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
