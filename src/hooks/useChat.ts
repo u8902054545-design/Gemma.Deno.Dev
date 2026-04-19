@@ -24,7 +24,7 @@ export const useChat = () => {
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [chatId] = useState(() => crypto.randomUUID());
+  const [chatId, setChatId] = useState(() => crypto.randomUUID());
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
@@ -37,6 +37,21 @@ export const useChat = () => {
         behavior: smooth ? 'smooth' : 'auto'
       });
     }
+  }, []);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        setMessages([]);
+        setInput('');
+        setIsTyping(false);
+        setChatId(crypto.randomUUID());
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
