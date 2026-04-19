@@ -54,10 +54,6 @@ export const useChat = () => {
     };
   }, []);
 
-  useEffect(() => {
-    scrollToBottom(isTyping);
-  }, [messages, isTyping, scrollToBottom]);
-
   const handleSend = useCallback(async (overrideInput?: string) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
 
@@ -65,8 +61,8 @@ export const useChat = () => {
 
     const { data: { session } } = await supabase.auth.getSession();
 
-    if (!session) {
-      setSnackbarMessage('Пожалуйста, войди в аккаунт через Google.');
+    if (!session?.access_token) {
+      setSnackbarMessage('Ошибка авторизации. Попробуй перезайти в аккаунт.');
       setIsSnackbarOpen(true);
       return;
     }
@@ -77,6 +73,10 @@ export const useChat = () => {
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
+
+    const aiMsgId = (Date.now() + 1).toString();
+    const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '' };
+    setMessages(prev => [...prev, newAiMsg]);
 
     try {
       const response = await fetch(SUPABASE_ENDPOINT, {
@@ -92,25 +92,34 @@ export const useChat = () => {
         }),
       });
 
-      const responseData = await response.json().catch(() => ({}));
-
       if (!response.ok) {
-        throw new Error(responseData.error || 'Network error');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      const newAiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'ai',
-        content: responseData.content
-      };
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedContent = "";
 
-      setMessages(prev => [...prev, newAiMsg]);
+      if (!reader) throw new Error('ReadableStream not supported');
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedContent += chunk;
+
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === aiMsgId ? { ...msg, content: accumulatedContent } : msg
+          )
+        );
+      }
+
     } catch (error: any) {
-      const errorMessage = error.message.includes('Failed to fetch')
-        ? 'Network error: Check your connection'
-        : error.message;
-
-      setSnackbarMessage(errorMessage);
+      setMessages(prev => prev.filter(msg => msg.id !== aiMsgId));
+      setSnackbarMessage(error.message);
       setIsSnackbarOpen(true);
     } finally {
       setIsTyping(false);

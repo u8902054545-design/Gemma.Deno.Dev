@@ -5,7 +5,7 @@ import { useAuth } from './hooks/useAuth';
 import { ChatHeader } from './components/ChatHeader';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
-import { TypingIndicator } from './components/TypingIndicator';
+// TypingIndicator удален, так как мы используем GemmaSkeleton внутри ChatMessage
 import { StartScreen } from './components/StartScreen';
 import Snackbar from './components/Snackbar';
 import Login from './components/Login';
@@ -71,9 +71,9 @@ export default function App() {
                   transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
                   className="absolute inset-0 flex flex-col"
                 >
-                  <StartScreen 
-                    userName={user.user_metadata?.full_name || user.email} 
-                    onSelectSuggestion={(text) => handleSend(text)} 
+                  <StartScreen
+                    userName={user.user_metadata?.full_name || user.email}
+                    onSelectSuggestion={(text) => handleSend(text)}
                   />
                 </motion.div>
               ) : (
@@ -89,10 +89,11 @@ export default function App() {
                       key={msg.id}
                       role={msg.role}
                       content={msg.content}
+                      // Передаем флаг генерации только для последнего AI сообщения
                       isGenerating={isTyping && index === messages.length - 1 && msg.role === 'ai'}
                     />
                   ))}
-                  {isTyping && <TypingIndicator />}
+                  {/* Старый TypingIndicator удален отсюда */}
                 </motion.div>
               )}
             </AnimatePresence>

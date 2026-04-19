@@ -1,6 +1,7 @@
 import React, { useState, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
+import { GemmaSkeleton } from './GemmaSkeleton';
 import { mdEasing, mdDuration } from '../motion/transitions';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -18,6 +19,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
   const [isThoughtExpanded, setIsThoughtExpanded] = useState(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
+  // Логика обработки "мыслей" нейросети (если есть текст в звездочках)
   const { thought, mainContent } = useMemo(() => {
     const thoughtMatch = content.match(/^\*([\s\S]*?)\*/);
     if (thoughtMatch) {
@@ -40,121 +42,104 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: mdDuration.short4, ease: mdEasing.decelerate }}
-      className={`flex flex-col gap-2 mb-8 ${isAI ? 'items-start' : 'items-end'}`}
+      className={`flex flex-col mb-8 ${isAI ? 'items-start w-full' : 'items-end'}`}
     >
-      <div className={`flex items-center gap-3 ${isAI ? 'flex-row' : 'flex-row-reverse'}`}>
-        <div className="relative flex items-center justify-center w-12 h-12">
-          <AnimatePresence>
-            {isAI && isGenerating && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 flex items-center justify-center z-0"
-              >
-                <div className="gradient-loader" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          <div className={`z-10 flex items-center justify-center rounded-full bg-black ${!isAI ? 'bg-[var(--google-blue)] w-9 h-9' : 'w-10 h-10'}`}>
-            {isAI ? (
-              <GemmaIcon className="w-8 h-8" />
-            ) : (
-              <span className="material-symbols-outlined text-white text-[20px]">person</span>
-            )}
+      {/* Заголовок сообщения для AI */}
+      {isAI && (
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center justify-center w-6 h-6">
+            <GemmaIcon className="w-6 h-6" />
           </div>
+          <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">Gemma</span>
+          
+          {thought && (
+            <button
+              onClick={() => setIsThoughtExpanded(!isThoughtExpanded)}
+              className="flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--md-sys-color-surface-container-high)] hover:bg-[#333] transition-colors text-[11px] text-[var(--md-sys-color-on-surface-variant)] border border-[var(--md-sys-color-outline)]/20"
+            >
+              <span>Показать мысль</span>
+              <span className="material-symbols-outlined text-[14px]">
+                {isThoughtExpanded ? 'expand_less' : 'expand_more'}
+              </span>
+            </button>
+          )}
         </div>
+      )}
 
-        {isAI && thought && (
-          <button
-            onClick={() => setIsThoughtExpanded(!isThoughtExpanded)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--md-sys-color-surface-container-high)] hover:bg-[#333] border border-[var(--md-sys-color-outline)]/30 transition-colors text-xs text-[var(--md-sys-color-on-surface-variant)]"
-          >
-            <span>Показать мысль</span>
-            <span className="material-symbols-outlined text-[14px]">
-              {isThoughtExpanded ? 'expand_less' : 'expand_more'}
-            </span>
-          </button>
-        )}
-      </div>
-
-      <div className="w-full flex flex-col gap-2">
+      {/* Контент сообщения */}
+      <div className={`w-full flex flex-col ${isAI ? 'items-start' : 'items-end'}`}>
         <AnimatePresence>
           {isAI && thought && isThoughtExpanded && (
             <motion.div
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: mdDuration.medium4, ease: mdEasing.standard }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden w-full"
             >
-              <div className="text-sm text-[var(--md-sys-color-on-surface-variant)] italic border-l-2 border-[var(--md-sys-color-outline)] pl-4 py-1 my-2">
+              <div className="text-sm text-[var(--md-sys-color-on-surface-variant)] italic border-l-2 border-[var(--md-sys-color-outline)] pl-4 py-1 mb-4">
                 {thought}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className={`max-w-[100%] text-[16px] leading-relaxed markdown-content ${
+        <div className={`max-w-full text-[16px] leading-relaxed markdown-content ${
             isAI
-              ? 'text-[var(--md-sys-color-on-background)] px-1'
-              : 'bg-[var(--google-blue)] text-white px-4 py-2 rounded-2xl self-end shadow-lg shadow-blue-900/10'
+              ? 'text-[var(--md-sys-color-on-background)] w-full'
+              : 'bg-[var(--google-blue)] text-white px-4 py-2 rounded-2xl shadow-lg shadow-blue-900/10 inline-block'
           }`}
         >
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              code({ node, inline, className, children, ...props }: any) {
-                const match = /language-(\w+)/.exec(className || '');
-                const codeString = String(children).replace(/\n$/, '');
-                return !inline && match ? (
-                  <div className="code-container my-6">
-                    <div className="code-header">
-                      <span className="code-lang">{match[1]}</span>
-                      <button
-                        onClick={() => handleCopy(codeString)}
-                        className="copy-button"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">
-                          {copiedText === codeString ? 'done' : 'content_copy'}
-                        </span>
-                        <span>{copiedText === codeString ? 'Скопировано' : 'Копировать'}</span>
-                      </button>
+          {/* Ключевое условие: если AI генерирует и контента еще нет — показываем скелетон */}
+          {isAI && isGenerating && !mainContent ? (
+            <GemmaSkeleton />
+          ) : (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code({ node, inline, className, children, ...props }: any) {
+                  const match = /language-(\w+)/.exec(className || '');
+                  const codeString = String(children).replace(/\n$/, '');
+                  return !inline && match ? (
+                    <div className="code-container my-6">
+                      <div className="code-header">
+                        <span className="code-lang">{match[1]}</span>
+                        <button onClick={() => handleCopy(codeString)} className="copy-button">
+                          <span className="material-symbols-outlined text-[18px]">
+                            {copiedText === codeString ? 'done' : 'content_copy'}
+                          </span>
+                          <span>{copiedText === codeString ? 'Скопировано' : 'Копировать'}</span>
+                        </button>
+                      </div>
+                      <div className="code-gradient-border">
+                        <SyntaxHighlighter
+                          style={atomDark}
+                          language={match[1]}
+                          PreTag="div"
+                          customStyle={{
+                            margin: 0,
+                            borderRadius: '0 0 12px 12px',
+                            background: '#0b0b0b',
+                            padding: '16px',
+                            fontSize: '14px'
+                          }}
+                          {...props}
+                        >
+                          {codeString}
+                        </SyntaxHighlighter>
+                      </div>
                     </div>
-                    <div className="code-gradient-border">
-                      <SyntaxHighlighter
-                        style={atomDark}
-                        language={match[1]}
-                        PreTag="div"
-                        customStyle={{
-                          margin: 0,
-                          borderRadius: '0 0 12px 12px',
-                          background: '#0b0b0b',
-                          padding: '16px',
-                          fontSize: '14px'
-                        }}
-                        {...props}
-                      >
-                        {codeString}
-                      </SyntaxHighlighter>
-                    </div>
-                  </div>
-                ) : (
-                  <code className="bg-[var(--md-sys-color-surface-container-high)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--google-blue)]" {...props}>
-                    {children}
-                  </code>
-                );
-              },
-              a: ({ children, href }) => (
-                <a href={href} className="text-[var(--google-blue)] underline underline-offset-4" target="_blank" rel="noopener noreferrer">
-                  {children}
-                </a>
-              ),
-              p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
-            }}
-          >
-            {mainContent}
-          </ReactMarkdown>
+                  ) : (
+                    <code className="bg-[var(--md-sys-color-surface-container-high)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--google-blue)]" {...props}>
+                      {children}
+                    </code>
+                  );
+                },
+                p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+              }}
+            >
+              {mainContent}
+            </ReactMarkdown>
+          )}
         </div>
       </div>
     </motion.div>
