@@ -33,7 +33,7 @@ export const useChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let interval: number;
+    let interval: any;
 
     if (messages.length > 0 && !chatTitle) {
       const fetchTitle = async () => {
@@ -155,6 +155,7 @@ export const useChat = () => {
 
   return {
     messages,
+    setMessages,
     input,
     setInput,
     selectedModel,
@@ -165,7 +166,10 @@ export const useChat = () => {
     messagesEndRef,
     handleSend,
     handleKeyDown,
+    chatId,
+    setChatId,
     chatTitle,
+    setChatTitle,
     models: MODELS,
     snackbarMessage,
     isSnackbarOpen,

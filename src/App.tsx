@@ -15,6 +15,7 @@ export default function App() {
 
   const {
     messages,
+    setMessages,
     input,
     setInput,
     selectedModel,
@@ -29,7 +30,10 @@ export default function App() {
     snackbarMessage,
     isSnackbarOpen,
     setIsSnackbarOpen,
-    chatTitle
+    chatId,
+    setChatId,
+    chatTitle,
+    setChatTitle
   } = useChat();
 
   if (loading) {
@@ -58,7 +62,14 @@ export default function App() {
           exit="exit"
           className="h-screen w-full bg-black text-white font-sans flex flex-col overflow-hidden relative"
         >
-          <ChatHeader messages={messages} chatTitle={chatTitle} />
+          <ChatHeader 
+            messages={messages} 
+            chatTitle={chatTitle} 
+            chatId={chatId}
+            setMessages={setMessages}
+            setChatId={setChatId}
+            setChatTitle={setChatTitle}
+          />
 
           <main className="flex-1 overflow-y-auto max-w-full w-full mx-auto flex flex-col scroll-smooth relative">
             <AnimatePresence mode="wait">

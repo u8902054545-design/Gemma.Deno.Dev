@@ -1,15 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Drawer } from 'vaul';
 import { UserProfile } from './UserProfile';
 import { mdEasing } from '../motion/transitions';
+import { downloadHistory, handleNewChat, deleteChat, renameChat } from './chatHeaderFunctions';
+import { RenameDialog } from './RenameDialog';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
 interface ChatHeaderProps {
   messages: any[];
   chatTitle: string;
+  chatId: string;
+  setMessages: (msgs: any[]) => void;
+  setChatId: (id: string) => void;
+  setChatTitle: (title: string) => void;
 }
 
-export const ChatHeader: React.FC<ChatHeaderProps> = ({ messages, chatTitle }) => {
+export const ChatHeader: React.FC<ChatHeaderProps> = ({
+  messages,
+  chatTitle,
+  chatId,
+  setMessages,
+  setChatId,
+  setChatTitle
+}) => {
   const isChatStarted = messages.length > 0;
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const onNewChatClick = () => {
+    handleNewChat(setMessages, setChatId, setChatTitle);
+  };
+
+  const handleRenameConfirm = (newTitle: string) => {
+    renameChat(chatId, newTitle, setChatTitle);
+  };
+
+  const handleDeleteConfirm = () => {
+    deleteChat(chatId, onNewChatClick);
+    setIsDeleteOpen(false);
+  };
 
   return (
     <header className="px-4 py-3 flex justify-between items-center sticky top-0 z-50 bg-black/50 backdrop-blur-md h-[64px]">
@@ -41,9 +73,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ messages, chatTitle }) =
           {!isChatStarted ? (
             <motion.div
               key="user-avatar"
-              initial={{ opacity: 0, scale: 0.8, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, scale: 0.8, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.3, ease: mdEasing.standard }}
             >
               <UserProfile />
@@ -51,33 +83,105 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ messages, chatTitle }) =
           ) : (
             <motion.div
               key="chat-controls"
-              initial={{ opacity: 0, scale: 0.8, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, scale: 0.8, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.3, ease: mdEasing.standard }}
               className="flex items-center gap-1"
             >
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
+              <button onClick={onNewChatClick} className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
                 <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">
                   edit_square
                 </span>
               </button>
-              
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
-                <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">
-                  download
-                </span>
-              </button>
 
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
-                <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">
-                  more_vert
-                </span>
-              </button>
+              <Drawer.Root open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                <Drawer.Trigger asChild>
+                  <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">
+                      download
+                    </span>
+                  </button>
+                </Drawer.Trigger>
+                <Drawer.Portal>
+                  <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[60]" />
+                  <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none">
+                    <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
+                    <div className="p-4 bg-[#1c1b1f] pb-8">
+                      <div className="text-[var(--md-sys-color-on-surface)] text-lg font-medium px-4 mb-4 text-center">Export Chat</div>
+                      <button 
+                        onClick={() => { downloadHistory(messages, 'txt'); setIsDownloadOpen(false); }} 
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-gray-400">description</span>
+                        <span className="text-gray-200">Download as TXT</span>
+                      </button>
+                      <button 
+                        onClick={() => { downloadHistory(messages, 'json'); setIsDownloadOpen(false); }} 
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-gray-400">data_object</span>
+                        <span className="text-gray-200">Download as JSON</span>
+                      </button>
+                    </div>
+                  </Drawer.Content>
+                </Drawer.Portal>
+              </Drawer.Root>
+
+              <Drawer.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <Drawer.Trigger asChild>
+                  <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">
+                      more_vert
+                    </span>
+                  </button>
+                </Drawer.Trigger>
+                <Drawer.Portal>
+                  <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[60]" />
+                  <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none">
+                    <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
+                    <div className="p-4 bg-[#1c1b1f] pb-8">
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setTimeout(() => setIsRenameOpen(true), 300);
+                        }}
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200"
+                      >
+                        <span className="material-symbols-outlined">edit</span>
+                        <span>Rename chat</span>
+                      </button>
+                      <button 
+                        onClick={() => { 
+                          setIsMenuOpen(false); 
+                          setTimeout(() => setIsDeleteOpen(true), 300);
+                        }} 
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-[#ffb4ab]"
+                      >
+                        <span className="material-symbols-outlined">delete</span>
+                        <span>Delete chat</span>
+                      </button>
+                    </div>
+                  </Drawer.Content>
+                </Drawer.Portal>
+              </Drawer.Root>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      <RenameDialog
+        isOpen={isRenameOpen}
+        onClose={() => setIsRenameOpen(false)}
+        currentTitle={chatTitle}
+        onConfirm={handleRenameConfirm}
+      />
+
+      <DeleteConfirmDialog
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </header>
   );
 };
