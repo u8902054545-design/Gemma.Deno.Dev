@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
+import { useUserChats } from './hooks/useUserChats';
 import { ChatHeader } from './components/ChatHeader';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
@@ -15,6 +16,7 @@ import { mainContentVariants } from './motion/drawer';
 export default function App() {
   const { user, loading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { chats, refreshChats } = useUserChats(user?.id);
 
   const {
     messages,
@@ -36,7 +38,8 @@ export default function App() {
     chatId,
     setChatId,
     chatTitle,
-    setChatTitle
+    setChatTitle,
+    loadChatMessages
   } = useChat();
 
   if (loading) {
@@ -61,17 +64,25 @@ export default function App() {
         </motion.div>
       ) : (
         <div className="h-screen w-full bg-black overflow-hidden relative">
-          <Sidebar 
+          <Sidebar
             isOpen={isSidebarOpen}
             onClose={closeSidebar}
-            chats={[]} 
+            chats={chats}
             currentChatId={chatId}
-            onChatSelect={() => {}}
+            onChatSelect={async (id) => {
+              const selectedChat = chats.find(c => c.id === id);
+              if (selectedChat) {
+                setChatTitle(selectedChat.title);
+              }
+              await loadChatMessages(id);
+              closeSidebar();
+            }}
             onNewChat={() => {
               setMessages([]);
               setChatId(crypto.randomUUID());
               setChatTitle('');
               closeSidebar();
+              refreshChats();
             }}
           />
 
@@ -81,9 +92,9 @@ export default function App() {
             animate={isSidebarOpen ? "open" : "closed"}
             className="h-full w-full flex flex-col bg-black relative shadow-2xl"
           >
-            <ChatHeader 
-              messages={messages} 
-              chatTitle={chatTitle} 
+            <ChatHeader
+              messages={messages}
+              chatTitle={chatTitle}
               chatId={chatId}
               setMessages={setMessages}
               setChatId={setChatId}

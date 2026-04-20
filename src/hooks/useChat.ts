@@ -26,15 +26,12 @@ export const useChat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [chatId, setChatId] = useState(() => crypto.randomUUID());
   const [chatTitle, setChatTitle] = useState('');
-
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let interval: any;
-
     if (messages.length > 0 && !chatTitle) {
       const fetchTitle = async () => {
         const { data } = await supabase
@@ -42,17 +39,14 @@ export const useChat = () => {
           .select('title')
           .eq('id', chatId)
           .maybeSingle();
-
         if (data?.title) {
           setChatTitle(data.title);
           if (interval) clearInterval(interval);
         }
       };
-
       interval = setInterval(fetchTitle, 3000);
       fetchTitle();
     }
-
     return () => {
       if (interval) clearInterval(interval);
     };
@@ -68,36 +62,55 @@ export const useChat = () => {
         setChatTitle('');
       }
     });
-
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
+  const loadChatMessages = async (id: string) => {
+    try {
+      setIsTyping(true);
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('chat_id', id)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+
+      const formattedMessages: Message[] = data.map(m => ({
+        id: m.id,
+        role: (m.role === 'assistant' || m.role === 'ai' || m.role === 'model') ? 'ai' : 'user',
+        content: m.content
+      }));
+
+      setMessages(formattedMessages);
+      setChatId(id);
+    } catch (err: any) {
+      setSnackbarMessage('Ошибка при загрузке сообщений');
+      setIsSnackbarOpen(true);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
   const handleSend = useCallback(async (overrideInput?: string) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
-
     if (!textToSend.trim() || isTyping) return;
-
     const { data: { session } } = await supabase.auth.getSession();
-
     if (!session?.access_token) {
       setSnackbarMessage('Ошибка авторизации. Попробуй перезайти в аккаунт.');
       setIsSnackbarOpen(true);
       return;
     }
-
     const userText = textToSend.trim();
     const newUserMsg: Message = { id: Date.now().toString(), role: 'user', content: userText };
-
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
-
     const aiMsgId = (Date.now() + 1).toString();
     const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '' };
     setMessages(prev => [...prev, newAiMsg]);
-
     try {
       const response = await fetch(SUPABASE_ENDPOINT, {
         method: 'POST',
@@ -111,32 +124,29 @@ export const useChat = () => {
           chat_id: chatId
         }),
       });
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
-
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
-
       if (!reader) throw new Error('ReadableStream not supported');
-
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         const chunk = decoder.decode(value, { stream: true });
         accumulatedContent += chunk;
-
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === aiMsgId ? { ...msg, content: accumulatedContent } : msg
-          )
-        );
+        setMessages(prev => {
+          const lastMsg = prev[prev.length - 1];
+          if (lastMsg && lastMsg.id === aiMsgId) {
+            const newArray = [...prev];
+            newArray[newArray.length - 1] = { ...lastMsg, content: accumulatedContent };
+            return newArray;
+          }
+          return prev;
+        });
       }
-
     } catch (error: any) {
       setMessages(prev => prev.filter(msg => msg.id !== aiMsgId));
       setSnackbarMessage(error.message);
@@ -170,6 +180,7 @@ export const useChat = () => {
     setChatId,
     chatTitle,
     setChatTitle,
+    loadChatMessages,
     models: MODELS,
     snackbarMessage,
     isSnackbarOpen,
