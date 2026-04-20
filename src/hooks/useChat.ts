@@ -25,19 +25,38 @@ export const useChat = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [chatId, setChatId] = useState(() => crypto.randomUUID());
+  const [chatTitle, setChatTitle] = useState('');
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = useCallback((smooth = false) => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({
-        behavior: smooth ? 'smooth' : 'auto'
-      });
+  useEffect(() => {
+    let interval: number;
+
+    if (messages.length > 0 && !chatTitle) {
+      const fetchTitle = async () => {
+        const { data } = await supabase
+          .from('chats')
+          .select('title')
+          .eq('id', chatId)
+          .maybeSingle();
+
+        if (data?.title) {
+          setChatTitle(data.title);
+          if (interval) clearInterval(interval);
+        }
+      };
+
+      interval = setInterval(fetchTitle, 3000);
+      fetchTitle();
     }
-  }, []);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [chatId, messages.length, chatTitle]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -46,6 +65,7 @@ export const useChat = () => {
         setInput('');
         setIsTyping(false);
         setChatId(crypto.randomUUID());
+        setChatTitle('');
       }
     });
 
@@ -110,8 +130,8 @@ export const useChat = () => {
         const chunk = decoder.decode(value, { stream: true });
         accumulatedContent += chunk;
 
-        setMessages(prev => 
-          prev.map(msg => 
+        setMessages(prev =>
+          prev.map(msg =>
             msg.id === aiMsgId ? { ...msg, content: accumulatedContent } : msg
           )
         );
@@ -145,6 +165,7 @@ export const useChat = () => {
     messagesEndRef,
     handleSend,
     handleKeyDown,
+    chatTitle,
     models: MODELS,
     snackbarMessage,
     isSnackbarOpen,
