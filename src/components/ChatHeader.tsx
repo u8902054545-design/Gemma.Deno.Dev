@@ -14,6 +14,8 @@ interface ChatHeaderProps {
   setMessages: (msgs: any[]) => void;
   setChatId: (id: string) => void;
   setChatTitle: (title: string) => void;
+  onMenuClick: () => void;
+  isSidebarOpen: boolean;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -22,7 +24,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   chatId,
   setMessages,
   setChatId,
-  setChatTitle
+  setChatTitle,
+  onMenuClick,
+  isSidebarOpen
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -44,23 +48,37 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   };
 
   return (
-    <header className="px-4 py-3 flex justify-between items-center sticky top-0 z-50 bg-black/50 backdrop-blur-md h-[64px]">
-      <div className="flex items-center gap-4 flex-1 overflow-hidden">
-        <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center shrink-0">
-          <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface)]">
-            menu
-          </span>
-        </button>
+    <header className="px-4 py-3 flex justify-between items-center sticky top-0 z-50 bg-black h-[64px]">
+      <div className="flex items-center gap-2 flex-1 overflow-hidden">
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+          <AnimatePresence initial={false}>
+            {!isSidebarOpen && (
+              <motion.button
+                key="hamburger"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.2, ease: mdEasing.standard }}
+                onClick={onMenuClick}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center"
+              >
+                <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface)]">
+                  menu
+                </span>
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
 
         <AnimatePresence mode="wait">
           {isChatStarted && chatTitle && (
             <motion.h1
               key={chatTitle}
-              initial={{ opacity: 0, x: -10 }}
+              initial={{ opacity: 0, x: -5 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
+              exit={{ opacity: 0, x: -5 }}
               transition={{ duration: 0.4, ease: mdEasing.standard }}
-              className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] truncate mr-4"
+              className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] truncate mr-4 ml-1"
             >
               {chatTitle}
             </motion.h1>
@@ -105,20 +123,20 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 </Drawer.Trigger>
                 <Drawer.Portal>
                   <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[60]" />
-                  <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none">
+                  <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none border-none">
                     <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
                     <div className="p-4 bg-[#1c1b1f] pb-8">
-                      <div className="text-[var(--md-sys-color-on-surface)] text-lg font-medium px-4 mb-4 text-center">Export Chat</div>
-                      <button 
-                        onClick={() => { downloadHistory(messages, 'txt'); setIsDownloadOpen(false); }} 
-                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors"
+                      <div className="text-[var(--md-sys-color-on-surface)] text-lg font-medium px-4 mb-4 text-center border-none">Export Chat</div>
+                      <button
+                        onClick={() => { downloadHistory(messages, 'txt'); setIsDownloadOpen(false); }}
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors border-none"
                       >
                         <span className="material-symbols-outlined text-gray-400">description</span>
                         <span className="text-gray-200">Download as TXT</span>
                       </button>
-                      <button 
-                        onClick={() => { downloadHistory(messages, 'json'); setIsDownloadOpen(false); }} 
-                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors"
+                      <button
+                        onClick={() => { downloadHistory(messages, 'json'); setIsDownloadOpen(false); }}
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors border-none"
                       >
                         <span className="material-symbols-outlined text-gray-400">data_object</span>
                         <span className="text-gray-200">Download as JSON</span>
@@ -138,7 +156,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 </Drawer.Trigger>
                 <Drawer.Portal>
                   <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[60]" />
-                  <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none">
+                  <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none border-none">
                     <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
                     <div className="p-4 bg-[#1c1b1f] pb-8">
                       <button
@@ -146,17 +164,17 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                           setIsMenuOpen(false);
                           setTimeout(() => setIsRenameOpen(true), 300);
                         }}
-                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200"
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
                       >
                         <span className="material-symbols-outlined">edit</span>
                         <span>Rename chat</span>
                       </button>
-                      <button 
-                        onClick={() => { 
-                          setIsMenuOpen(false); 
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
                           setTimeout(() => setIsDeleteOpen(true), 300);
-                        }} 
-                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-[#ffb4ab]"
+                        }}
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-[#ffb4ab] border-none"
                       >
                         <span className="material-symbols-outlined">delete</span>
                         <span>Delete chat</span>
