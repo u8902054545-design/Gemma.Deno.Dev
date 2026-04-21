@@ -69,12 +69,12 @@ export default function App() {
             onClose={closeSidebar}
             chats={chats}
             currentChatId={chatId}
-            onChatSelect={async (id) => {
+            onChatSelect={(id) => {
               const selectedChat = chats.find(c => c.id === id);
               if (selectedChat) {
                 setChatTitle(selectedChat.title);
               }
-              await loadChatMessages(id);
+              loadChatMessages(id);
               closeSidebar();
             }}
             onNewChat={() => {
@@ -131,7 +131,7 @@ export default function App() {
                         key={msg.id}
                         role={msg.role}
                         content={msg.content}
-                        isGenerating={isTyping && index === messages.length - 1 && msg.role === 'ai'}
+                        isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
                       />
                     ))}
                   </motion.div>

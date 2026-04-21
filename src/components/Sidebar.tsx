@@ -62,6 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onSelectChat={(id) => {
           onChatSelect(id);
           setIsSearchOpen(false);
+          onClose();
         }}
       />
 
@@ -102,7 +103,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 <button
-                  onClick={() => { onNewChat(); }}
+                  onClick={() => { 
+                    onNewChat(); 
+                    onClose();
+                  }}
                   className="flex items-center gap-3 px-4 py-3 bg-[#2b2930] hover:bg-[#36343b] text-[#c2e7ff] rounded-2xl transition-all active:scale-[0.95]"
                 >
                   <span className="material-symbols-outlined text-[22px]">edit_square</span>
@@ -121,7 +125,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       return (
                         <button
                           key={chat.id}
-                          onClick={() => onChatSelect(chat.id)}
+                          onClick={() => {
+                            onChatSelect(chat.id);
+                            onClose();
+                          }}
                           className={`group flex items-center px-4 py-3 rounded-full text-sm text-left truncate transition-all duration-200 ${
                             isActive
                             ? 'bg-[#c2e7ff] text-[#001d35] font-bold'

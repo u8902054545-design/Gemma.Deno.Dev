@@ -69,7 +69,10 @@ export const useChat = () => {
 
   const loadChatMessages = async (id: string) => {
     try {
+      setMessages([{ id: 'loading-skeleton', role: 'ai', content: '' }]);
       setIsTyping(true);
+      setChatId(id);
+
       const { data, error } = await supabase
         .from('messages')
         .select('*')
@@ -85,8 +88,8 @@ export const useChat = () => {
       }));
 
       setMessages(formattedMessages);
-      setChatId(id);
     } catch (err: any) {
+      setMessages([]);
       setSnackbarMessage('Ошибка при загрузке сообщений');
       setIsSnackbarOpen(true);
     } finally {
