@@ -1,26 +1,20 @@
 import { supabase } from '../config';
 
-export const handleNewChat = (setMessages: (m: any[]) => void, setChatId: (id: string) => void, setChatTitle: (t: string) => void) => {
+export const handleNewChat = (
+  setMessages: (m: any[]) => void, 
+  setChatId: (id: string) => void, 
+  setChatTitle: (t: string) => void
+) => {
   setMessages([]);
   setChatId(crypto.randomUUID());
   setChatTitle('');
 };
 
-export const deleteChat = async (chatId: string, onSuccess: () => void) => {
-  try {
-    const { error } = await supabase
-      .from('chats')
-      .delete()
-      .eq('id', chatId);
-
-    if (error) throw error;
-    onSuccess();
-  } catch (error) {
-    console.error('Error deleting chat:', error);
-  }
-};
-
-export const renameChat = async (chatId: string, newTitle: string, setChatTitle: (t: string) => void) => {
+export const renameChat = async (
+  chatId: string, 
+  newTitle: string, 
+  setChatTitle: (t: string) => void
+) => {
   try {
     const { error } = await supabase
       .from('chats')
@@ -47,4 +41,5 @@ export const downloadHistory = (messages: any[], format: 'txt' | 'json') => {
   a.href = url;
   a.download = `chat-history.${format}`;
   a.click();
+  URL.revokeObjectURL(url);
 };

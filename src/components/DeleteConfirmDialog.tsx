@@ -16,7 +16,12 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({ isOpen
         {isOpen && (
           <AlertDialog.Portal forceMount>
             <AlertDialog.Overlay asChild>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 z-[100]" />
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }} 
+                className="fixed inset-0 bg-black/80 z-[100]" 
+              />
             </AlertDialog.Overlay>
             <AlertDialog.Content asChild>
               <motion.div
@@ -32,17 +37,25 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({ isOpen
                 <AlertDialog.Description className="text-[#cac4d0] text-sm leading-relaxed mb-6">
                   You will no longer be able to send messages in this chat. The chat will also be deleted from your history.
                 </AlertDialog.Description>
+                
                 <div className="flex justify-end gap-2">
-                  <AlertDialog.Cancel asChild>
-                    <button className="px-4 py-2 text-[var(--md-sys-color-primary)] font-medium hover:bg-white/5 rounded-full transition-colors">
-                      Cancel
-                    </button>
-                  </AlertDialog.Cancel>
-                  <AlertDialog.Action asChild>
-                    <button onClick={onConfirm} className="px-4 py-2 text-[#ffb4ab] font-medium hover:bg-[#ffb4ab]/10 rounded-full transition-colors">
-                      Delete
-                    </button>
-                  </AlertDialog.Action>
+                  <button 
+                    type="button"
+                    onClick={onClose}
+                    className="px-4 py-2 text-[var(--md-sys-color-primary)] font-medium hover:bg-white/5 rounded-full transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onConfirm();
+                    }} 
+                    className="px-4 py-2 text-[#ffb4ab] font-medium hover:bg-[#ffb4ab]/10 rounded-full transition-colors active:bg-[#ffb4ab]/20"
+                  >
+                    Delete
+                  </button>
                 </div>
               </motion.div>
             </AlertDialog.Content>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Drawer } from 'vaul';
 import { UserProfile } from './UserProfile';
 import { mdEasing } from '../motion/transitions';
-import { downloadHistory, handleNewChat, deleteChat, renameChat } from './chatHeaderFunctions';
+import { downloadHistory, handleNewChat, renameChat } from './chatHeaderFunctions';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
@@ -16,6 +16,7 @@ interface ChatHeaderProps {
   setChatTitle: (title: string) => void;
   onMenuClick: () => void;
   isSidebarOpen: boolean;
+  deleteChatFromDB: (id: string) => Promise<void>;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -26,7 +27,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   setChatId,
   setChatTitle,
   onMenuClick,
-  isSidebarOpen
+  isSidebarOpen,
+  deleteChatFromDB
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -42,9 +44,14 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     renameChat(chatId, newTitle, setChatTitle);
   };
 
-  const handleDeleteConfirm = () => {
-    deleteChat(chatId, onNewChatClick);
-    setIsDeleteOpen(false);
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteChatFromDB(chatId);
+      onNewChatClick();
+      setIsDeleteOpen(false);
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
   };
 
   return (

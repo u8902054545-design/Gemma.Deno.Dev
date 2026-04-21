@@ -16,7 +16,7 @@ import { mainContentVariants } from './motion/drawer';
 export default function App() {
   const { user, loading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { chats, refreshChats } = useUserChats(user?.id);
+  const { chats, refreshChats, deleteChat } = useUserChats(user?.id);
 
   const {
     messages,
@@ -101,6 +101,7 @@ export default function App() {
               setChatTitle={setChatTitle}
               onMenuClick={toggleSidebar}
               isSidebarOpen={isSidebarOpen}
+              deleteChatFromDB={deleteChat}
             />
 
             <main className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth relative">
