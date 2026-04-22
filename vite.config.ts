@@ -13,6 +13,9 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+        workbox: {
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        },
         manifest: {
           name: 'Gemma Open Access',
           short_name: 'Gemma',
@@ -33,11 +36,6 @@ export default defineConfig(({mode}) => {
         },
       }),
     ],
-    build: {
-      minify: false,
-      target: 'esnext',
-      chunkSizeWarningLimit: 2000,
-    },
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
