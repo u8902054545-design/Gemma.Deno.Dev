@@ -17,10 +17,11 @@ export default defineConfig(({mode}) => {
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         },
         manifest: {
-          name: 'Gemma Open Access',
+          name: 'Gemma.Deno.Dev',
           short_name: 'Gemma',
           description: 'Gemma Open Access PWA',
-          theme_color: '#ffffff',
+          theme_color: '#000000',
+          background_color: '#000000',
           icons: [
             {
               src: 'pwa-192x192.png',
