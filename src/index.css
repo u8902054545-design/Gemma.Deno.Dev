@@ -233,3 +233,17 @@ md-circular-progress {
   --md-circular-progress-active-indicator-color: var(--google-blue);
   --md-circular-progress-active-indicator-width: 12;
 }
+
+textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+textarea {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
