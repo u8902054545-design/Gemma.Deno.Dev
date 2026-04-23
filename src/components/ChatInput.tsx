@@ -72,7 +72,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 
   return (
     <footer className="w-full max-w-4xl mx-auto fixed bottom-0 left-1/2 -translate-x-1/2 z-50">
-      <div className="pt-[1px] px-[1px] rounded-t-[32px] bg-gradient-to-r from-[#4285F4] via-[#EA4335] to-[#34A853]">
+      <div className="pt-[1px] px-[1px] rounded-t-[32px] animate-gradient">
         <div className="bg-black rounded-t-[31px] flex flex-col p-2 pb-3">
           <textarea
             ref={textareaRef}

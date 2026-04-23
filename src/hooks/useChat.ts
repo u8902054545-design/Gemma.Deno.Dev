@@ -30,8 +30,13 @@ export const useChat = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const { createSignal, stopRequest } = useStopRequest();
+
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, []);
 
   useEffect(() => {
     let interval: any;
@@ -81,7 +86,7 @@ export const useChat = () => {
         .select('*')
         .eq('chat_id', id)
         .order('created_at', { ascending: true });
-      
+
       if (error) throw error;
 
       const formattedMessages: Message[] = data.map(m => ({
@@ -91,6 +96,7 @@ export const useChat = () => {
       }));
 
       setMessages(formattedMessages);
+      setTimeout(scrollToBottom, 100);
     } catch (err: any) {
       setMessages([]);
       setSnackbarMessage('Ошибка при загрузке сообщений');
@@ -103,17 +109,22 @@ export const useChat = () => {
   const handleSend = useCallback(async (overrideInput?: string) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
     if (!textToSend.trim() || isTyping) return;
+
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
       setSnackbarMessage('Ошибка авторизации. Попробуй перезайти в аккаунт.');
       setIsSnackbarOpen(true);
       return;
     }
+
     const userText = textToSend.trim();
     const newUserMsg: Message = { id: Date.now().toString(), role: 'user', content: userText };
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
+
+    setTimeout(scrollToBottom, 50);
+
     const aiMsgId = (Date.now() + 1).toString();
     const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '' };
     setMessages(prev => [...prev, newAiMsg]);
@@ -147,14 +158,16 @@ export const useChat = () => {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        
         const chunk = decoder.decode(value, { stream: true });
         accumulatedContent += chunk;
+        
         setMessages(prev => {
+          if (prev.length === 0) return prev;
           const lastMsg = prev[prev.length - 1];
-          if (lastMsg && lastMsg.id === aiMsgId) {
-            const newArray = [...prev];
-            newArray[newArray.length - 1] = { ...lastMsg, content: accumulatedContent };
-            return newArray;
+          if (lastMsg.id === aiMsgId) {
+            const updatedMsg = { ...lastMsg, content: accumulatedContent };
+            return [...prev.slice(0, -1), updatedMsg];
           }
           return prev;
         });
@@ -162,11 +175,11 @@ export const useChat = () => {
     } catch (error: any) {
       if (error.name === 'AbortError') {
         setMessages(prev => {
+          if (prev.length === 0) return prev;
           const lastMsg = prev[prev.length - 1];
-          if (lastMsg && lastMsg.id === aiMsgId) {
-            const newArray = [...prev];
-            newArray[newArray.length - 1] = { ...lastMsg, content: lastMsg.content + '_STOPPED_' };
-            return newArray;
+          if (lastMsg.id === aiMsgId) {
+            const updatedMsg = { ...lastMsg, content: lastMsg.content + '_STOPPED_' };
+            return [...prev.slice(0, -1), updatedMsg];
           }
           return prev;
         });
@@ -178,7 +191,7 @@ export const useChat = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, selectedModel, chatId, createSignal]);
+  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

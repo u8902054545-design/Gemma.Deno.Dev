@@ -31,10 +31,10 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
       className={`flex flex-col mb-8 ${isAI ? 'items-start w-full' : 'items-end'}`}
     >
       {isAI && (
-        <ChatMessageHeader 
-          hasThought={!!thought} 
-          isExpanded={isThoughtExpanded} 
-          onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)} 
+        <ChatMessageHeader
+          hasThought={!!thought}
+          isExpanded={isThoughtExpanded}
+          onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)}
         />
       )}
 
@@ -59,36 +59,45 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
           }`}
         >
           {isAI && isGenerating && !mainContent ? (
-            <GemmaSkeleton />
+            <div className="min-h-[40px] flex items-center">
+              <GemmaSkeleton />
+            </div>
           ) : (
-            <>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  code({ inline, className, children }: any) {
-                    const match = /language-(\w+)/.exec(className || '');
-                    const codeString = String(children).replace(/\n$/, '');
-                    return !inline && match ? (
-                      <CodeBlock 
-                        language={match[1]} 
-                        value={codeString} 
-                        isCopied={copiedText === codeString} 
-                        onCopy={handleCopy} 
-                      />
-                    ) : (
-                      <code className="bg-[var(--md-sys-color-surface-container-high)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--google-blue)]">
-                        {children}
-                      </code>
-                    );
-                  },
-                  p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
-                }}
-              >
-                {mainContent}
-              </ReactMarkdown>
+            <div className="min-h-[1.5em]">
+              {isAI ? (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    pre: ({ children }) => <>{children}</>,
+                    code({ inline, className, children }: any) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      const codeString = String(children).replace(/\n$/, '');
+                      return !inline && match ? (
+                        <CodeBlock
+                          language={match[1]}
+                          value={codeString}
+                          isCopied={copiedText === codeString}
+                          onCopy={handleCopy}
+                        />
+                      ) : (
+                        <code className="bg-[var(--md-sys-color-surface-container-high)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--google-blue)]">
+                          {children}
+                        </code>
+                      );
+                    },
+                    p: ({ children }) => <p className="mb-4 last:mb-0 break-words">{children}</p>,
+                  }}
+                >
+                  {mainContent}
+                </ReactMarkdown>
+              ) : (
+                <div className="whitespace-pre-wrap break-words">
+                  {mainContent}
+                </div>
+              )}
 
               {isStopped && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)] w-fit"
@@ -101,7 +110,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({ role, content, isGen
                   </span>
                 </motion.div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
