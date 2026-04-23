@@ -5,6 +5,7 @@ type ChatInputProps = {
   input: string;
   setInput: (value: string) => void;
   handleSend: () => void;
+  stopRequest: () => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
   isDropdownOpen: boolean;
@@ -14,7 +15,7 @@ type ChatInputProps = {
 };
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
-  input, setInput, handleSend, selectedModel, setSelectedModel,
+  input, setInput, handleSend, stopRequest, selectedModel, setSelectedModel,
   isDropdownOpen, setIsDropdownOpen, isTyping, models,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -99,15 +100,27 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                   {isListening ? "mic" : "mic_none"}
                 </span>
               </button>
-              <button
-                onClick={handleSend}
-                disabled={!input.trim() || isTyping}
-                className="p-2 rounded-full hover:bg-[#1a1a1a] disabled:opacity-10 transition-transform active:scale-90 flex items-center justify-center"
-              >
-                <span className={`material-symbols-outlined text-[24px] ${input.trim() && !isTyping ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
-                  send
-                </span>
-              </button>
+              
+              {isTyping ? (
+                <button
+                  onClick={stopRequest}
+                  className="p-2 rounded-full hover:bg-[#1a1a1a] transition-transform active:scale-90 flex items-center justify-center"
+                >
+                  <span className="material-symbols-outlined text-[24px] text-[#EA4335]">
+                    stop_circle
+                  </span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className="p-2 rounded-full hover:bg-[#1a1a1a] disabled:opacity-10 transition-transform active:scale-90 flex items-center justify-center"
+                >
+                  <span className={`material-symbols-outlined text-[24px] ${input.trim() ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
+                    send
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         </div>

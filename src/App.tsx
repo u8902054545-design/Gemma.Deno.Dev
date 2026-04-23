@@ -39,7 +39,8 @@ export default function App() {
     setChatId,
     chatTitle,
     setChatTitle,
-    loadChatMessages
+    loadChatMessages,
+    stopRequest
   } = useChat();
 
   if (loading) {
@@ -145,7 +146,7 @@ export default function App() {
               input={input}
               setInput={setInput}
               handleSend={handleSend}
-              handleKeyDown={handleKeyDown}
+              stopRequest={stopRequest}
               selectedModel={selectedModel}
               setSelectedModel={setSelectedModel}
               isDropdownOpen={isDropdownOpen}

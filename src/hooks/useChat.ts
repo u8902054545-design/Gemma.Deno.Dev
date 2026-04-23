@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { SUPABASE_ENDPOINT, supabase } from '../config';
+import { useStopRequest } from './useStopRequest';
 
 export type Message = {
   id: string;
@@ -29,6 +30,8 @@ export const useChat = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { createSignal, stopRequest } = useStopRequest();
 
   useEffect(() => {
     let interval: any;
@@ -114,27 +117,33 @@ export const useChat = () => {
     const aiMsgId = (Date.now() + 1).toString();
     const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '' };
     setMessages(prev => [...prev, newAiMsg]);
+
     try {
+      const signal = createSignal();
       const response = await fetch(SUPABASE_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
+        signal,
         body: JSON.stringify({
           message: userText,
           model: selectedModel,
           chat_id: chatId
         }),
       });
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
+
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
       if (!reader) throw new Error('ReadableStream not supported');
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -151,13 +160,25 @@ export const useChat = () => {
         });
       }
     } catch (error: any) {
-      setMessages(prev => prev.filter(msg => msg.id !== aiMsgId));
-      setSnackbarMessage(error.message);
-      setIsSnackbarOpen(true);
+      if (error.name === 'AbortError') {
+        setMessages(prev => {
+          const lastMsg = prev[prev.length - 1];
+          if (lastMsg && lastMsg.id === aiMsgId) {
+            const newArray = [...prev];
+            newArray[newArray.length - 1] = { ...lastMsg, content: lastMsg.content + '_STOPPED_' };
+            return newArray;
+          }
+          return prev;
+        });
+      } else {
+        setMessages(prev => prev.filter(msg => msg.id !== aiMsgId));
+        setSnackbarMessage(error.message);
+        setIsSnackbarOpen(true);
+      }
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, selectedModel, chatId]);
+  }, [input, isTyping, selectedModel, chatId, createSignal]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -187,6 +208,7 @@ export const useChat = () => {
     models: MODELS,
     snackbarMessage,
     isSnackbarOpen,
-    setIsSnackbarOpen
+    setIsSnackbarOpen,
+    stopRequest
   };
 };
