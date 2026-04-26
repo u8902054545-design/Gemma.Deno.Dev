@@ -15,10 +15,10 @@
   --md-sys-color-on-surface-variant: #c4c7c5;
   --md-sys-color-outline: #444746;
   --md-sys-color-primary: #a8c7fa;
-  --google-blue: #4285F4;
-  --google-red: #EA4335;
-  --google-yellow: #FBBC05;
-  --google-green: #34A853;
+  
+  --gemma-blue-deep: #446eff;
+  --gemma-blue-bright: #2e96ff;
+  --gemma-blue-light: #b1c5ff;
 
   --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --md-sys-motion-duration-long2: 500ms;
@@ -87,10 +87,10 @@ main {
 .google-mesh-gradient {
   background-color: var(--md-sys-color-background);
   background-image:
-    radial-gradient(at 0% 0%, rgba(66, 133, 244, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(234, 67, 53, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(251, 188, 5, 0.07) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(52, 168, 83, 0.07) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(68, 110, 255, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(46, 150, 255, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(177, 197, 255, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(68, 110, 255, 0.1) 0px, transparent 50%);
   transform: translateZ(0);
 }
 
@@ -99,7 +99,7 @@ main {
   height: 40px;
   border-radius: 50%;
   position: absolute;
-  background: conic-gradient(var(--google-blue), var(--google-red), var(--google-yellow), var(--google-green), var(--google-blue));
+  background: conic-gradient(var(--gemma-blue-deep), var(--gemma-blue-bright), var(--gemma-blue-light), var(--gemma-blue-deep));
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 100%);
   mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 100%);
   animation: spin 1.5s linear infinite;
@@ -114,7 +114,7 @@ main {
 .animate-gradient {
   background-size: 200% 200%;
   animation: animated-gradient-slow 8s ease infinite;
-  background-image: linear-gradient(90deg, var(--google-blue), var(--google-red), var(--google-yellow), var(--google-green), var(--google-blue));
+  background-image: linear-gradient(90deg, var(--gemma-blue-deep), var(--gemma-blue-bright), var(--gemma-blue-light), var(--gemma-blue-deep));
   backface-visibility: hidden;
   transform: translateZ(0);
   will-change: background-position;
@@ -129,7 +129,7 @@ main {
 .text-gradient {
   background-size: 200% 200%;
   animation: animated-gradient-slow 8s ease infinite;
-  background-image: linear-gradient(90deg, var(--google-blue), var(--google-yellow), var(--google-green));
+  background-image: linear-gradient(90deg, var(--gemma-blue-deep), var(--gemma-blue-bright), var(--gemma-blue-light));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -228,7 +228,7 @@ div[class*='motion'] {
 .code-gradient-border {
   padding: 1.5px;
   border-radius: 0 0 14px 14px;
-  background: linear-gradient(90deg, var(--google-blue), var(--google-red), var(--google-yellow), var(--google-green), var(--google-blue));
+  background: linear-gradient(90deg, var(--gemma-blue-deep), var(--gemma-blue-bright), var(--gemma-blue-light), var(--gemma-blue-deep));
   background-size: 200% 200%;
   animation: animated-gradient-slow 8s ease infinite;
   overflow: hidden;
@@ -250,7 +250,7 @@ div[class*='motion'] {
 
 md-circular-progress {
   --md-circular-progress-size: 24px;
-  --md-circular-progress-active-indicator-color: var(--google-blue);
+  --md-circular-progress-active-indicator-color: var(--gemma-blue-bright);
   --md-circular-progress-active-indicator-width: 12;
 }
 
