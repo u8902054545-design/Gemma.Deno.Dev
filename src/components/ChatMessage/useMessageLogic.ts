@@ -4,7 +4,7 @@ export const useMessageLogic = (
   content: string, 
   messageId?: string, 
   initialFeedback?: 'like' | 'dislike' | null,
-  onFeedback?: (id: string, type: 'like' | 'dislike') => void
+  onFeedback?: (id: string, type: 'like' | 'dislike' | null) => void
 ) => {
   const [isThoughtExpanded, setIsThoughtExpanded] = useState(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export const useMessageLogic = (
     setTimeout(() => setCopiedText(null), 2000);
   }, []);
 
-  const handleFeedback = useCallback((type: 'like' | 'dislike') => {
+  const handleFeedback = useCallback((type: 'like' | 'dislike' | null) => {
     if (!messageId || !onFeedback) return;
     setLocalFeedback(type);
     onFeedback(messageId, type);

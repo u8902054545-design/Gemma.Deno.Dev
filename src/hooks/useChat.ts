@@ -108,9 +108,13 @@ export const useChat = () => {
     }
   };
 
-  const handleFeedback = useCallback(async (messageId: string, type: 'like' | 'dislike') => {
+  const handleFeedback = useCallback(async (messageId: string, type: 'like' | 'dislike' | null) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) return;
+
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId ? { ...msg, feedback: type } : msg
+    ));
 
     try {
       await fetch(SUPABASE_ENDPOINT, {
@@ -124,10 +128,6 @@ export const useChat = () => {
           feedback: type
         }),
       });
-
-      setMessages(prev => prev.map(msg => 
-        msg.id === messageId ? { ...msg, feedback: type } : msg
-      ));
     } catch (error) {
       console.error('Error saving feedback:', error);
     }

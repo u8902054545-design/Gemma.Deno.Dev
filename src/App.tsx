@@ -138,6 +138,7 @@ export default function App() {
                         feedback={msg.feedback}
                         onFeedback={handleFeedback}
                         isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
+                        isLast={index === messages.length - 1}
                       />
                     ))}
                   </motion.div>

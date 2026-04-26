@@ -9,13 +9,18 @@ import { useMessageLogic } from './useMessageLogic';
 import { ChatMessageHeader } from './ChatMessageHeader';
 import { CodeBlock } from './CodeBlock';
 
-const ChatMessageComponent: React.FC<ChatMessageProps> = ({ 
+interface ExtendedChatMessageProps extends ChatMessageProps {
+  isLast?: boolean;
+}
+
+const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({ 
   role, 
   content, 
   isGenerating, 
   messageId, 
   feedback, 
-  onFeedback 
+  onFeedback,
+  isLast 
 }) => {
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
@@ -124,10 +129,15 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({
         </div>
 
         {isAI && !isGenerating && mainContent && (
-          <div className="mt-4 flex flex-col gap-3 w-full select-none">
+          <motion.div 
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: mdDuration.medium4, ease: mdEasing.standard }}
+            className="mt-4 flex flex-col gap-3 w-full select-none"
+          >
             <div className="flex items-center gap-1">
               <button
-                onClick={() => handleFeedback('like')}
+                onClick={() => handleFeedback(localFeedback === 'like' ? null : 'like')}
                 className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
                   localFeedback === 'like' ? 'text-[var(--google-blue)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
                 }`}
@@ -137,7 +147,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({
                 </span>
               </button>
               <button
-                onClick={() => handleFeedback('dislike')}
+                onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
                 className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
                   localFeedback === 'dislike' ? 'text-[var(--google-red)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
                 }`}
@@ -156,10 +166,12 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({
               </button>
             </div>
 
-            <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
-              Gemma is an AI and may make mistakes. Verify its responses.
-            </p>
-          </div>
+            {isLast && (
+              <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
+                Gemma is an AI and may make mistakes. Verify its responses.
+              </p>
+            )}
+          </motion.div>
         )}
       </div>
     </motion.div>
