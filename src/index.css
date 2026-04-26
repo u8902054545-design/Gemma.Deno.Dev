@@ -39,6 +39,7 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 
 .select-text {
@@ -51,6 +52,20 @@ html, body {
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+main::-webkit-scrollbar {
+  width: 4px;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+main {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 .material-symbols-outlined {

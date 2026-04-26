@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
@@ -17,6 +17,8 @@ export default function App() {
   const { user, loading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { chats, refreshChats, deleteChat } = useUserChats(user?.id);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     messages,
@@ -43,6 +45,18 @@ export default function App() {
     loadChatMessages,
     stopRequest
   } = useChat();
+
+  const handleScroll = useCallback(() => {
+    if (scrollContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+      const scrollBottom = scrollHeight - clientHeight - scrollTop;
+      setShowScrollButton(scrollBottom > 300);
+    }
+  }, []);
+
+  const scrollToBottomInstant = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   if (loading) {
     return <div className="h-screen w-full bg-black" />;
@@ -106,7 +120,11 @@ export default function App() {
               deleteChatFromDB={deleteChat}
             />
 
-            <main className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth relative">
+            <main 
+              ref={scrollContainerRef}
+              onScroll={handleScroll}
+              className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth relative"
+            >
               <AnimatePresence mode="wait">
                 {messages.length === 0 ? (
                   <motion.div
@@ -145,6 +163,22 @@ export default function App() {
                 )}
               </AnimatePresence>
               <div ref={messagesEndRef} />
+
+              <AnimatePresence>
+                {showScrollButton && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                    onClick={scrollToBottomInstant}
+                    className="fixed bottom-28 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] opacity-100 border border-[#444746] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined">
+                      arrow_downward
+                    </span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </main>
 
             <ChatInput

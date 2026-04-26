@@ -238,6 +238,7 @@ export const useChat = () => {
     setIsDropdownOpen,
     isTyping,
     messagesEndRef,
+    scrollToBottom,
     handleSend,
     handleKeyDown,
     chatId,
