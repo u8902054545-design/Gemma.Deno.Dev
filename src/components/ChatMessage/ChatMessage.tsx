@@ -68,8 +68,10 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           )}
         </AnimatePresence>
 
-        <div className={`max-w-full text-[16px] leading-relaxed markdown-content select-text ${
-            isAI ? 'text-[var(--md-sys-color-on-background)] w-full' : 'bg-[var(--google-blue)] text-white px-4 py-2 rounded-2xl shadow-lg shadow-blue-900/10 inline-block'
+        <div className={`text-[16px] leading-relaxed markdown-content select-text ${
+            isAI 
+              ? 'text-[var(--md-sys-color-on-background)] w-full' 
+              : 'max-w-[85%] bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] px-5 py-3 rounded-[24px] rounded-tr-[4px] shadow-sm inline-block'
           }`}
         >
           {isAI && isGenerating && !mainContent ? (
@@ -94,7 +96,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                           onCopy={handleCopy}
                         />
                       ) : (
-                        <code className="bg-[var(--md-sys-color-surface-container-high)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--google-blue)]">
+                        <code className="bg-[var(--md-sys-color-surface-container-high)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--md-sys-color-primary)]">
                           {children}
                         </code>
                       );
@@ -139,7 +141,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               <button
                 onClick={() => handleFeedback(localFeedback === 'like' ? null : 'like')}
                 className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
-                  localFeedback === 'like' ? 'text-[var(--google-blue)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
+                  localFeedback === 'like' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
                 }`}
               >
                 <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'like' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'like' ? "'FILL' 1" : "" }}>
@@ -149,7 +151,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               <button
                 onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
                 className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
-                  localFeedback === 'dislike' ? 'text-[var(--google-red)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
+                  localFeedback === 'dislike' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
                 }`}
               >
                 <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'dislike' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'dislike' ? "'FILL' 1" : "" }}>
