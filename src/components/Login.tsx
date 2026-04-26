@@ -38,7 +38,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         className="relative w-full max-w-[400px] bg-[var(--md-sys-color-surface)] rounded-[32px] p-8 flex flex-col items-center border border-[var(--md-sys-color-outline)]/20 input-glow z-10"
       >
         <h1 className="text-3xl font-bold tracking-tight mb-2 text-gradient text-center">
-          Gemma Open Access
+          Gemma Deno Dev | Open Access
         </h1>
         <p className="text-[var(--md-sys-color-on-surface-variant)] text-sm mb-10 text-center font-medium">
           Sign in to access your premium workspace

@@ -2,19 +2,33 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# Gemma Open Access
 
-This contains everything you need to run your app locally.
+A professional AI chat interface featuring a deep-black aesthetic and vibrant animated gradients. This application is built with React, Vite, and integrated with Supabase for backend functionality.
 
-View your app in AI Studio: https://ai.studio/apps/77d19bf2-6b72-4b6e-9a9a-897f050ef346
+## Features
 
-## Run Locally
+* **PWA Ready:** Installable on mobile and desktop devices.
+* **Modern UI:** High-performance animations and sleek design.
+* **Fast Response:** Optimized for quick interaction and low latency.
 
-**Prerequisites:**  Node.js
+## Getting Started
 
+### Prerequisites
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+* **Node.js** (Latest LTS version recommended)
+* **NPM** (Comes with Node.js)
+
+### Installation
+
+1.  Clone the repository and navigate to the project folder.
+2.  Install all necessary dependencies:
+    ```bash
+    npm install
+    ```
+
+### Configuration
+
+Create a `.env.local` file in the root directory and add your API key:
+```env
+GEMINI_API_KEY=your_api_key_here
