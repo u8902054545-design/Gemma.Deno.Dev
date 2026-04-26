@@ -29,58 +29,62 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-black google-mesh-gradient font-sans text-white p-4">
+    <div className="min-h-screen flex items-center justify-center relative bg-black p-4 overflow-hidden font-sans">
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#4285F4] blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#34A853] blur-[120px]" />
+      </div>
+
       <motion.div
         variants={pageVariants}
         initial="initial"
         animate="animate"
         exit="exit"
-        className="relative w-full max-w-[400px] bg-[var(--md-sys-color-surface)] rounded-[32px] p-8 flex flex-col items-center border border-[var(--md-sys-color-outline)]/20 input-glow z-10"
+        className="relative w-full max-w-[400px] bg-[#111111] rounded-[28px] p-8 flex flex-col items-center border border-white/10 shadow-2xl z-10"
       >
-        <h1 className="text-3xl font-bold tracking-tight mb-2 text-gradient text-center">
-          Gemma Deno Dev | Open Access
-        </h1>
-        <p className="text-[var(--md-sys-color-on-surface-variant)] text-sm mb-10 text-center font-medium">
-          Sign in to access your premium workspace
-        </p>
-
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{
-            delay: 0.2,
-            duration: mdDuration.medium4,
-            ease: mdEasing.emphasized
-          }}
-          className="w-32 h-32 mb-12 flex items-center justify-center bg-white/5 rounded-[32px] border border-white/10 shadow-inner"
+          transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
+          className="mb-6"
         >
-          <GemmaIcon className="w-20 h-20" />
+          <GemmaIcon className="w-16 h-16" />
         </motion.div>
+
+        <h1 className="text-2xl font-medium tracking-tight mb-2 text-[#e3e3e3] text-center">
+          Gemma Deno Dev
+        </h1>
+        
+        <p className="text-[#c4c7c5] text-sm mb-10 text-center">
+          Open Access Workspace
+        </p>
 
         <button
           onClick={handleLogin}
           disabled={isLoading}
-          className="w-full relative flex items-center justify-center gap-3 bg-white text-black rounded-full py-4 px-6 text-[15px] font-semibold transition-all duration-200 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-80 h-[56px]"
+          className="w-full h-[52px] flex items-center justify-center gap-3 bg-white hover:bg-[#f1f1f1] text-black rounded-full px-6 text-[14px] font-medium transition-all active:scale-[0.98] disabled:opacity-70"
         >
           {isLoading ? (
             <md-circular-progress 
               indeterminate 
               style={{ 
-                '--md-circular-progress-size': '28px',
+                '--md-circular-progress-size': '24px',
                 '--md-circular-progress-active-indicator-color': '#000000' 
               } as any}
             />
           ) : (
             <>
-              <GoogleIcon className="text-[22px]" />
-              <span>Continue with Google</span>
+              <GoogleIcon className="w-5 h-5" />
+              <span>Sign in with Google</span>
             </>
           )}
         </button>
 
-        <p className="text-[var(--md-sys-color-on-surface-variant)]/50 text-[10px] mt-6 text-center max-w-[280px] uppercase tracking-wider">
-          Material 3 Design System
-        </p>
+        <div className="mt-10 pt-6 border-t border-white/5 w-full flex justify-center">
+          <span className="text-[10px] text-white/30 uppercase tracking-[2px]">
+            Material Design 3
+          </span>
+        </div>
       </motion.div>
 
       <Snackbar
