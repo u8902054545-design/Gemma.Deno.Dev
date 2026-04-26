@@ -1,8 +1,14 @@
 import { useState, useMemo, useCallback } from 'react';
 
-export const useMessageLogic = (content: string) => {
+export const useMessageLogic = (
+  content: string, 
+  messageId?: string, 
+  initialFeedback?: 'like' | 'dislike' | null,
+  onFeedback?: (id: string, type: 'like' | 'dislike') => void
+) => {
   const [isThoughtExpanded, setIsThoughtExpanded] = useState(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
+  const [localFeedback, setLocalFeedback] = useState<'like' | 'dislike' | null>(initialFeedback || null);
 
   const { thought, mainContent } = useMemo(() => {
     const thoughtMatch = content.match(/^\*([\s\S]*?)\*/);
@@ -17,11 +23,17 @@ export const useMessageLogic = (content: string) => {
     return { thought: null, mainContent: content.trim() };
   }, [content]);
 
-  const handleCopy = useCallback((code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedText(code);
+  const handleCopy = useCallback((text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
     setTimeout(() => setCopiedText(null), 2000);
   }, []);
+
+  const handleFeedback = useCallback((type: 'like' | 'dislike') => {
+    if (!messageId || !onFeedback) return;
+    setLocalFeedback(type);
+    onFeedback(messageId, type);
+  }, [messageId, onFeedback]);
 
   return {
     isThoughtExpanded,
@@ -29,6 +41,8 @@ export const useMessageLogic = (content: string) => {
     copiedText,
     handleCopy,
     thought,
-    mainContent
+    mainContent,
+    localFeedback,
+    handleFeedback
   };
 };

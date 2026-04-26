@@ -10,7 +10,7 @@ import { StartScreen } from './components/StartScreen';
 import { Sidebar } from './components/Sidebar';
 import Snackbar from './components/Snackbar';
 import Login from './components/Login';
-import { pageVariants, mdEasing } from './motion/transitions';
+import { pageVariants } from './motion/transitions';
 import { mainContentVariants } from './motion/drawer';
 
 export default function App() {
@@ -31,6 +31,7 @@ export default function App() {
     messagesEndRef,
     handleSend,
     handleKeyDown,
+    handleFeedback,
     models,
     snackbarMessage,
     isSnackbarOpen,
@@ -131,8 +132,11 @@ export default function App() {
                     {messages.map((msg, index) => (
                       <ChatMessage
                         key={msg.id}
+                        messageId={msg.id}
                         role={msg.role}
                         content={msg.content}
+                        feedback={msg.feedback}
+                        onFeedback={handleFeedback}
                         isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
                       />
                     ))}

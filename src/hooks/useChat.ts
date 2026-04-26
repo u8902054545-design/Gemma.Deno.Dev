@@ -6,6 +6,7 @@ export type Message = {
   id: string;
   role: 'user' | 'ai';
   content: string;
+  feedback?: 'like' | 'dislike' | null;
 };
 
 export const MODELS = [
@@ -92,19 +93,45 @@ export const useChat = () => {
       const formattedMessages: Message[] = data.map(m => ({
         id: m.id,
         role: (m.role === 'assistant' || m.role === 'ai' || m.role === 'model') ? 'ai' : 'user',
-        content: m.content
+        content: m.content,
+        feedback: m.feedback
       }));
 
       setMessages(formattedMessages);
       setTimeout(scrollToBottom, 100);
     } catch (err: any) {
       setMessages([]);
-      setSnackbarMessage('Ошибка при загрузке сообщений');
+      setSnackbarMessage('Error loading messages');
       setIsSnackbarOpen(true);
     } finally {
       setIsTyping(false);
     }
   };
+
+  const handleFeedback = useCallback(async (messageId: string, type: 'like' | 'dislike') => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+
+    try {
+      await fetch(SUPABASE_ENDPOINT, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          message_id: messageId,
+          feedback: type
+        }),
+      });
+
+      setMessages(prev => prev.map(msg => 
+        msg.id === messageId ? { ...msg, feedback: type } : msg
+      ));
+    } catch (error) {
+      console.error('Error saving feedback:', error);
+    }
+  }, []);
 
   const handleSend = useCallback(async (overrideInput?: string) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
@@ -112,7 +139,7 @@ export const useChat = () => {
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
-      setSnackbarMessage('Ошибка авторизации. Попробуй перезайти в аккаунт.');
+      setSnackbarMessage('Session expired. Please sign in again.');
       setIsSnackbarOpen(true);
       return;
     }
@@ -158,10 +185,10 @@ export const useChat = () => {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         const chunk = decoder.decode(value, { stream: true });
         accumulatedContent += chunk;
-        
+
         setMessages(prev => {
           if (prev.length === 0) return prev;
           const lastMsg = prev[prev.length - 1];
@@ -218,6 +245,7 @@ export const useChat = () => {
     chatTitle,
     setChatTitle,
     loadChatMessages,
+    handleFeedback,
     models: MODELS,
     snackbarMessage,
     isSnackbarOpen,
